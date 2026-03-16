@@ -4,8 +4,7 @@
   "description": "Facebook Messenger Bot with Web Interface",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
-    "postinstall": "npm rebuild"
+    "start": "node index.js"
   },
   "engines": {
     "node": ">=18.0.0"
