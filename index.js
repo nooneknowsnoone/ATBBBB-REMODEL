@@ -7,14 +7,26 @@ const chalk = require('chalk');
 const bodyParser = require('body-parser');
 const cron = require('node-cron');
 const fsExtra = require('fs-extra');
+const Storage = require('./storage');
 
 const CMD_DIR = path.join(__dirname, 'cmd');
 const DATA_DIR = path.join(__dirname, 'data');
 
 if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR);
 
-const config = fs.existsSync(path.join(__dirname, './data/config.json')) ? JSON.parse(fs.readFileSync(path.join(__dirname, './data/config.json'), 'utf8')) : createConfig();
-const dev = fs.existsSync(path.join(__dirname, './dev.json')) ? JSON.parse(fs.readFileSync(path.join(__dirname, './dev.json'), 'utf8')) : [];
+// Initialize storage
+let config = [];
+let dev = [];
+
+async function initConfig() {
+  await Storage.init();
+  config = Storage.getConfig();
+  if (!config || config.length === 0) {
+    config = createConfig();
+    await Storage.updateConfig(config);
+  }
+  dev = fs.existsSync(path.join(__dirname, './dev.json')) ? JSON.parse(fs.readFileSync(path.join(__dirname, './dev.json'), 'utf8')) : [];
+}
 
 const Utils = new Object({
   commands: new Map(),
@@ -100,14 +112,8 @@ routes.forEach(route => {
 });
 
 app.get('/info', (req, res) => {
-  // Get all bot info from history.json (without exposing sensitive data)
-  const historyFile = './data/history.json';
-  let historyData = [];
-  try {
-    historyData = JSON.parse(fs.readFileSync(historyFile, 'utf-8'));
-  } catch (e) {
-    historyData = [];
-  }
+  // Get all bot info from storage (without exposing sensitive data)
+  const historyData = Storage.getHistory();
   
   // Get userids from Utils.account keys
   const userids = Array.from(Utils.account.keys());
@@ -186,6 +192,7 @@ app.post('/login', async (req, res) => {
 
 app.listen(3000, () => {
   console.log(chalk.green(`Server running at http://localhost:3000`));
+  main();
 });
 
 process.on('unhandledRejection', (reason) => {
@@ -210,7 +217,8 @@ async function accountLogin(state, enableCommands = [], prefix, admin = []) {
         }
         
         const { name, profileUrl, thumbSrc } = userInfo[userid];
-        let time = (JSON.parse(fs.readFileSync('./data/history.json', 'utf-8')).find(user => user.userid === userid) || {}).time || 0;
+        let historyEntry = Storage.getHistoryByUserId(userid);
+        let time = historyEntry?.time || 0;
         
         Utils.account.set(userid, {
           name,
@@ -258,10 +266,11 @@ async function accountLogin(state, enableCommands = [], prefix, admin = []) {
             return;
           }
           
-          let database = fs.existsSync('./data/database.json') ? JSON.parse(fs.readFileSync('./data/database.json', 'utf8')) : createDatabase();
+          let database = Storage.getDatabase();
           let data = Array.isArray(database) ? database.find(item => Object.keys(item)[0] === event?.threadID) : {};
           let adminIDS = data ? database : createThread(event.threadID, api);
-          let blacklist = (JSON.parse(fs.readFileSync('./data/history.json', 'utf-8')).find(blacklist => blacklist.userid === userid) || {}).blacklist || [];
+          let historyEntry = Storage.getHistoryByUserId(userid);
+          let blacklist = historyEntry?.blacklist || [];
           
           let hasPrefix = (event.body && aliases((event.body || '')?.trim().toLowerCase().split(/ +/).shift())?.hasPrefix == false) ? '' : prefix;
           let [command, ...args] = ((event.body || '').trim().toLowerCase().startsWith(hasPrefix?.toLowerCase()) ? (event.body || '').trim().substring(hasPrefix?.length).trim().split(/\s+/).map(arg => arg.trim()) : []);
@@ -395,13 +404,9 @@ async function accountLogin(state, enableCommands = [], prefix, admin = []) {
 }
 
 async function deleteThisUser(userid) {
-  const configFile = './data/history.json';
-  let configData = JSON.parse(fs.readFileSync(configFile, 'utf-8'));
   const sessionFile = path.join('./data/session', `${userid}.json`);
-  const index = configData.findIndex(item => item.userid === userid);
   
-  if (index !== -1) configData.splice(index, 1);
-  fs.writeFileSync(configFile, JSON.stringify(configData, null, 2));
+  await Storage.removeHistory(userid);
   
   try {
     fs.unlinkSync(sessionFile);
@@ -411,14 +416,13 @@ async function deleteThisUser(userid) {
 }
 
 async function addThisUser(userid, enableCommands, state, prefix, admin, blacklist = []) {
-  const configFile = './data/history.json';
   const sessionFolder = './data/session';
   const sessionFile = path.join(sessionFolder, `${userid}.json`);
   
   if (fs.existsSync(sessionFile)) return;
   
-  const configData = JSON.parse(fs.readFileSync(configFile, 'utf-8'));
-  configData.push({
+  // Add to storage
+  await Storage.addHistory({
     userid,
     prefix: prefix || "",
     admin: admin || [],
@@ -427,7 +431,6 @@ async function addThisUser(userid, enableCommands, state, prefix, admin, blackli
     time: 0
   });
   
-  fs.writeFileSync(configFile, JSON.stringify(configData, null, 2));
   fs.writeFileSync(sessionFile, JSON.stringify(state));
 }
 
@@ -443,19 +446,18 @@ async function main() {
   const cacheFile = './cmd/cache';
   if (!fs.existsSync(cacheFile)) fs.mkdirSync(cacheFile);
   
-  const configFile = './data/history.json';
-  if (!fs.existsSync(configFile)) fs.writeFileSync(configFile, '[]', 'utf-8');
+  // Initialize config first
+  await initConfig();
   
-  const configData = JSON.parse(fs.readFileSync(configFile, 'utf-8'));
   const sessionFolder = path.join('./data/session');
-  
   if (!fs.existsSync(sessionFolder)) fs.mkdirSync(sessionFolder);
   
-  const adminOfConfig = fs.existsSync('./data') && fs.existsSync('./data/config.json') ? JSON.parse(fs.readFileSync('./data/config.json', 'utf8')) : createConfig();
+  // Get history data from storage
+  const historyData = Storage.getHistory();
   
   // Scheduled restart
-  cron.schedule(`*/${adminOfConfig[0].masterKey.restartTime} * * * *`, async () => {
-    const history = JSON.parse(fs.readFileSync('./data/history.json', 'utf-8'));
+  cron.schedule(`*/${config[0].masterKey.restartTime} * * * *`, async () => {
+    const history = Storage.getHistory();
     history.forEach(user => {
       (!user || typeof user !== 'object') ? process.exit(1) : null;
       (user.time === undefined || user.time === null || isNaN(user.time)) ? process.exit(1) : null;
@@ -463,7 +465,7 @@ async function main() {
       update ? user.time = update.time : null;
     });
     await fsExtra.emptyDir(cacheFile);
-    await fs.writeFileSync('./data/history.json', JSON.stringify(history, null, 2));
+    await Storage.save();
     process.exit(1);
   });
   
@@ -472,7 +474,7 @@ async function main() {
     for (const file of fs.readdirSync(sessionFolder)) {
       const filePath = path.join(sessionFolder, file);
       try {
-        const { enableCommands, prefix, admin, blacklist } = configData.find(item => item.userid === path.parse(file).name) || {};
+        const { enableCommands, prefix, admin, blacklist } = historyData.find(item => item.userid === path.parse(file).name) || {};
         const state = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
         if (enableCommands) await accountLogin(state, enableCommands, prefix, admin, blacklist);
       } catch (error) {

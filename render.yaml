@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: autobot
+    env: node
+    buildCommand: npm install
+    startCommand: node index.js
+    envVars:
+      - key: JSONBIN_API_KEY
+        value: $2a$10$xhSSfFyBWDYlzAszxV/0DuHjfzfiE9kjfzcRZj2IxkyrZFSYjytvu
+      - key: JSONBIN_BIN_ID
+        value: 69b7bd75b7ec241ddc71a066
+      - key: USE_EXTERNAL_STORAGE
+        value: "true"
