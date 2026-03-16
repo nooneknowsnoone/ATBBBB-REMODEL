@@ -1,320 +1,373 @@
 const WebSocket = require("ws");
 
-// Session data stored in module scope (persists while bot is running)
-let activeSessions = null;
-let lastSentCache = null;
-let favoriteMap = null;
-let previousStockCache = null;
-
-// Special items that will trigger notification
-const specialNotifyItems = [
-	"cherry", "bamboo", "mango", "wheat", "cabbage", 
-	"super sprinkler", "turbo sprinkler", "watermelon", "pineapple"
-];
+const SOCKET_URL = "wss://ghz.indevs.in/ghz";
+const KEEP_ALIVE_INTERVAL_MS = 10000;
+const RECONNECT_DELAY_MS = 3000;
 
 let sharedWebSocket = null;
 let keepAliveInterval = null;
+let reconnectTimeout = null;
 
-function formatValue(val) {
-	if (val >= 1000000) return `x${(val / 1000000).toFixed(1)}M`;
-	if (val >= 1000) return `x${(val / 1000).toFixed(1)}K`;
-	return `x${val}`;
+const activeSessions = new Map();
+const lastSentCache = new Map();
+const favoriteMap = new Map();
+
+function resolveWebSocketCtor() {
+  if (typeof globalThis.WebSocket === "function") {
+    return globalThis.WebSocket;
+  }
+
+  try {
+    return require("ws");
+  } catch (_error) {
+    return null;
+  }
+}
+
+function getOpenState(webSocketCtor, socket) {
+  return socket?.OPEN ?? webSocketCtor?.OPEN ?? 1;
+}
+
+function isSocketOpen(webSocketCtor, socket) {
+  return Boolean(socket && socket.readyState === getOpenState(webSocketCtor, socket));
+}
+
+function bindSocketEvent(socket, eventName, handler) {
+  if (typeof socket.addEventListener === "function") {
+    socket.addEventListener(eventName, handler);
+    return;
+  }
+
+  if (typeof socket.on === "function") {
+    socket.on(eventName, handler);
+    return;
+  }
+
+  socket[`on${eventName}`] = handler;
+}
+
+function formatValue(value) {
+  if (value >= 1000000) return `x${(value / 1000000).toFixed(1)}M`;
+  if (value >= 1000) return `x${(value / 1000).toFixed(1)}K`;
+  return `x${value}`;
 }
 
 function getPHTime() {
-	return new Date(new Date().toLocaleString("en-US", { timeZone: "Asia/Manila" }));
+  return new Date(new Date().toLocaleString("en-US", { timeZone: "Asia/Manila" }));
 }
 
 function cleanText(text) {
-	return text ? text.trim().toLowerCase() : "";
+  return String(text || "").trim().toLowerCase();
 }
 
 function formatItems(items) {
-	if (!Array.isArray(items)) return "";
-	return items
-		.filter(i => i && i.quantity > 0)
-		.map(i => `|  ${i.emoji ? i.emoji + " " : ""}${i.name || "Unknown"}: ${formatValue(i.quantity)}`)
-		.join("\n");
+  return items
+    .filter((item) => item.quantity > 0)
+    .map((item) => `- ${item.emoji ? `${item.emoji} ` : ""}${item.name}: ${formatValue(item.quantity)}`)
+    .join("\n");
 }
 
-function findNewItems(currentSeeds, currentGear, previousSeeds, previousGear) {
-	const previousItems = new Map();
-
-	if (Array.isArray(previousSeeds)) {
-		for (const item of previousSeeds) {
-			if (item && item.name) {
-				previousItems.set(cleanText(item.name), item);
-			}
-		}
-	}
-	if (Array.isArray(previousGear)) {
-		for (const item of previousGear) {
-			if (item && item.name) {
-				previousItems.set(cleanText(item.name), item);
-			}
-		}
-	}
-
-	const newItems = [];
-	const allCurrent = [...(currentSeeds || []), ...(currentGear || [])];
-
-	for (const item of allCurrent) {
-		if (item && item.quantity > 0 && item.name) {
-			const itemName = cleanText(item.name);
-			const prevItem = previousItems.get(itemName);
-			if (!prevItem || prevItem.quantity < item.quantity) {
-				newItems.push(item);
-			}
-		}
-	}
-
-	return newItems;
+function getSessionKey(senderID, threadID) {
+  return `${senderID}:${threadID}`;
 }
 
-async function sendMentionMessage(api, threadId, content, participantIDs) {
-	if (!content || participantIDs.length === 0) return;
+function clearSocketTimers() {
+  if (keepAliveInterval) {
+    clearInterval(keepAliveInterval);
+    keepAliveInterval = null;
+  }
 
-	let body = `@everyone\n\n${content}`;
-	let mentions = participantIDs.map(id => ({
-		tag: "@everyone",
-		id: id,
-		fromIndex: 0
-	}));
-
-	await api.sendMessage({ body, mentions }, threadId);
+  if (reconnectTimeout) {
+    clearTimeout(reconnectTimeout);
+    reconnectTimeout = null;
+  }
 }
 
-function ensureWebSocketConnection(ghzSessions, ghzLastSent, ghzPreviousStock) {
-	if (sharedWebSocket && sharedWebSocket.readyState === WebSocket.OPEN) return;
-	
-	console.log("[GHZ] Connecting to WebSocket...");
-	sharedWebSocket = new WebSocket("wss://ghz.indevs.in/ghz");
+function closeSharedWebSocket() {
+  try {
+    sharedWebSocket?.close?.();
+  } catch (_error) {
+    // Ignore
+  }
+  sharedWebSocket = null;
+}
 
-	sharedWebSocket.on("open", () => {
-		console.log("[GHZ] WebSocket connected");
-		keepAliveInterval = setInterval(() => {
-			if (sharedWebSocket && sharedWebSocket.readyState === WebSocket.OPEN) {
-				sharedWebSocket.send("ping");
-			}
-		}, 10000);
-	});
+async function sendSessionMessage(session, text) {
+  if (!session || !session.api) {
+    return;
+  }
 
-	sharedWebSocket.on("message", async (data) => {
-		try {
-			const payload = JSON.parse(data.toString());
-			if (!payload) return;
+  try {
+    await session.api.sendMessage(text, session.threadID);
+  } catch (error) {
+    console.error(`[GHZ] Failed to send update:`, error.message);
+  }
+}
 
-			const seeds = Array.isArray(payload.seeds) ? payload.seeds : [];
-			const gear = Array.isArray(payload.gear) ? payload.gear : [];
-			const weather = payload.weather || null;
+function parseSocketMessage(rawData) {
+  if (rawData == null) return null;
 
-			// Iterate through all active sessions
-			for (const [threadId, session] of ghzSessions.entries()) {
-				const favList = favoriteMap.get(threadId) || [];
-				let sections = [];
-				let matchCount = 0;
+  if (typeof rawData === "string") {
+    return JSON.parse(rawData);
+  }
 
-				function checkItems(label, items) {
-					const available = items.filter(i => i && i.quantity > 0);
-					if (available.length === 0) return false;
+  if (Buffer.isBuffer(rawData)) {
+    return JSON.parse(rawData.toString("utf8"));
+  }
 
-					const matched = favList.length > 0
-						? available.filter(i => favList.includes(cleanText(i.name)))
-						: available;
+  if (rawData.data !== undefined) {
+    return parseSocketMessage(rawData.data);
+  }
 
-					if (favList.length > 0 && matched.length === 0) return false;
+  return JSON.parse(String(rawData));
+}
 
-					matchCount += matched.length;
-					sections.push(`${label}\n${formatItems(matched)}`);
-					return true;
-				}
+async function handleSocketPayload(payload, api) {
+  if (!payload || typeof payload !== "object") {
+    return;
+  }
 
-				checkItems("SEEDS", seeds);
-				checkItems("GEAR", gear);
+  const seeds = Array.isArray(payload.seeds) ? payload.seeds : [];
+  const gear = Array.isArray(payload.gear) ? payload.gear : [];
+  const weather = payload.weather || null;
 
-				if (favList.length > 0 && matchCount === 0) continue;
-				if (sections.length === 0) continue;
+  for (const [sessionKey, session] of activeSessions.entries()) {
+    const favoriteList = favoriteMap.get(session.senderID) || [];
+    const sections = [];
+    let matchCount = 0;
 
-				const weatherInfo = weather
-					? `WEATHER\n|  ${weather.status || "Unknown"}\n|  ${weather.description || "No description"}\n|  START: ${weather.startTime || "?"}\n|  END: ${weather.endTime || "?"}`
-					: "";
+    function checkItems(label, items) {
+      const available = items.filter((item) => item.quantity > 0);
+      if (available.length === 0) return;
 
-				const updatedAt = payload.lastUpdated || getPHTime().toLocaleString("en-PH");
+      const matched = favoriteList.length > 0
+        ? available.filter((item) => favoriteList.includes(cleanText(item.name)))
+        : available;
 
-				const title = favList.length > 0
-					? `${matchCount} Favorite ${matchCount > 1 ? "Items" : "Item"} Found!`
-					: "GARDEN HORIZON STOCKS";
+      if (favoriteList.length > 0 && matched.length === 0) {
+        return;
+      }
 
-				const messageContent = `${title}
+      matchCount += matched.length;
+      sections.push(`${label}:\n${formatItems(matched)}`);
+    }
 
-STOCKS
-${sections.join("\n")}
+    checkItems("Seeds", seeds);
+    checkItems("Gear", gear);
 
-${weatherInfo}
+    if (favoriteList.length > 0 && matchCount === 0) {
+      continue;
+    }
 
-UPDATED: ${updatedAt}`.trim();
+    if (sections.length === 0) {
+      continue;
+    }
 
-				if (!messageContent || messageContent.length === 0) continue;
+    const weatherInfo = weather
+      ? `Weather: ${weather.status}\nDetails: ${weather.description}\nStart: ${weather.startTime}\nEnd: ${weather.endTime}`
+      : "";
 
-				const messageKey = JSON.stringify({ title, sections, weatherInfo, updatedAt });
-				const lastSent = ghzLastSent.get(threadId);
-				if (lastSent === messageKey) continue;
-				ghzLastSent.set(threadId, messageKey);
+    const updatedAt = payload.lastUpdated || getPHTime().toLocaleString("en-PH");
+    const title = favoriteList.length > 0
+      ? `${matchCount} favorite item${matchCount > 1 ? "s" : ""} found`
+      : "Garden Horizon stock";
 
-				try {
-					const threadInfo = await session.api.getThreadInfo(session.threadID);
-					const participantIDs = threadInfo.participantIDs || [];
+    const message = [title, sections.join("\n\n"), weatherInfo, `Updated: ${updatedAt}`]
+      .filter(Boolean)
+      .join("\n\n");
 
-					const previousStock = ghzPreviousStock.get(threadId) || { seeds: [], gear: [] };
-					const newItems = findNewItems(seeds, gear, previousStock.seeds, previousStock.gear);
-					ghzPreviousStock.set(threadId, { seeds: [...seeds], gear: [...gear] });
+    if (lastSentCache.get(sessionKey) === message) {
+      continue;
+    }
 
-					let body = messageContent;
-					let mentions = [];
+    lastSentCache.set(sessionKey, message);
+    await sendSessionMessage(session, message);
+  }
+}
 
-					await session.api.sendMessage({ body, mentions }, session.threadID);
+function scheduleReconnect() {
+  if (reconnectTimeout || activeSessions.size === 0) {
+    return;
+  }
 
-					if (newItems.length > 0) {
-						const specialNewItems = newItems.filter(item => {
-							const itemName = cleanText(item.name);
-							return specialNotifyItems.includes(itemName);
-						});
+  reconnectTimeout = setTimeout(() => {
+    reconnectTimeout = null;
+    ensureWebSocketConnection();
+  }, RECONNECT_DELAY_MS);
+}
 
-						if (specialNewItems.length > 0) {
-							const specialItemText = specialNewItems
-								.map(item => `${item.emoji ? item.emoji + " " : ""}${item.name}: ${formatValue(item.quantity)}`)
-								.join("\n|  ");
+function ensureWebSocketConnection() {
+  const WebSocketCtor = resolveWebSocketCtor();
+  if (!WebSocketCtor) {
+    return false;
+  }
 
-							const notifyContent = `BEST ${specialNewItems.length > 1 ? "ITEMS" : "ITEM"} APPEARED!\n\n|  ${specialItemText}`;
+  if (isSocketOpen(WebSocketCtor, sharedWebSocket) || isSocketOpen(WebSocketCtor, sharedWebSocket)) {
+    return true;
+  }
 
-							await sendMentionMessage(session.api, session.threadID, notifyContent, participantIDs);
-						}
-					}
-				} catch (err) {
-					console.error("[GHZ] Error sending message:", err.message);
-				}
-			}
-		} catch (err) {
-			console.error("[GHZ] Error processing message:", err.message);
-		}
-	});
+  clearSocketTimers();
 
-	sharedWebSocket.on("close", () => {
-		console.log("[GHZ] WebSocket closed, reconnecting...");
-		clearInterval(keepAliveInterval);
-		sharedWebSocket = null;
-		setTimeout(() => ensureWebSocketConnection(ghzSessions, ghzLastSent, ghzPreviousStock), 3000);
-	});
+  try {
+    sharedWebSocket = new WebSocketCtor(SOCKET_URL);
+  } catch (error) {
+    console.error("[GHZ] Failed to create WebSocket:", error.message);
+    scheduleReconnect();
+    return false;
+  }
 
-	sharedWebSocket.on("error", (err) => {
-		console.error("[GHZ] WebSocket error:", err.message);
-		sharedWebSocket?.close();
-	});
+  bindSocketEvent(sharedWebSocket, "open", () => {
+    clearSocketTimers();
+    console.log("[GHZ] WebSocket connected");
+
+    keepAliveInterval = setInterval(() => {
+      if (isSocketOpen(WebSocketCtor, sharedWebSocket)) {
+        try {
+          sharedWebSocket.send("ping");
+        } catch (error) {
+          console.error("[GHZ] Keep-alive failed:", error.message);
+        }
+      }
+    }, KEEP_ALIVE_INTERVAL_MS);
+  });
+
+  bindSocketEvent(sharedWebSocket, "message", async (event) => {
+    try {
+      const payload = parseSocketMessage(event);
+      await handleSocketPayload(payload);
+    } catch (_error) {
+      // Ignore malformed payloads
+    }
+  });
+
+  bindSocketEvent(sharedWebSocket, "close", () => {
+    sharedWebSocket = null;
+    clearSocketTimers();
+    scheduleReconnect();
+  });
+
+  bindSocketEvent(sharedWebSocket, "error", () => {
+    try {
+      sharedWebSocket?.close?.();
+    } catch (_error) {
+      sharedWebSocket = null;
+    }
+  });
+
+  return true;
 }
 
 module.exports.config = {
   name: "ghz",
   version: "1.0.0",
   hasPermssion: 0,
-  credits: "VincentSensei",
-  description: "Track Garden Horizon live stock market in real-time via WebSocket",
+  credits: "Garden Horizon",
+  description: "Garden Horizon live stock tracker using WebSocket",
   commandCategory: "tools",
-  usages: "ghz on | ghz off | ghz fav add <item> | ghz fav remove <item> | ghz fav list",
+  usages: "ghz on | ghz off | ghz fav add <item> | ghz fav remove <item>",
   cooldowns: 3,
   role: 0
 };
 
-module.exports.run = async function({ api, event, args, Utils }) {
-  const { threadID, messageID, senderID } = event;
-  const subcmd = args[0]?.toLowerCase();
+module.exports.run = async function({ api, event, args }) {
+  const senderID = String(event.senderID);
+  const threadID = String(event.threadID);
+  const threadIDNum = event.threadID;
+  const sessionKey = getSessionKey(senderID, threadID);
+  const subcommand = cleanText(args[0]);
 
-  // Initialize storage using Utils if available, otherwise use module-level
-  if (!Utils.ghzSessions) {
-    Utils.ghzSessions = new Map();
-    Utils.ghzLastSent = new Map();
-    Utils.ghzPreviousStock = new Map();
-    favoriteMap = new Map();
-  } else {
-    activeSessions = Utils.ghzSessions;
-    lastSentCache = Utils.ghzLastSent;
-    previousStockCache = Utils.ghzPreviousStock;
-    favoriteMap = favoriteMap || new Map();
-  }
-
-  // Ensure module-level refs are set
-  activeSessions = Utils.ghzSessions;
-  lastSentCache = Utils.ghzLastSent;
-  previousStockCache = Utils.ghzPreviousStock;
-
-  if (subcmd === "fav") {
-    const action = args[1]?.toLowerCase();
-    const input = args.slice(2)
+  if (subcommand === "fav") {
+    const action = cleanText(args[1]);
+    const items = args
+      .slice(2)
       .join(" ")
       .split("|")
-      .map(i => cleanText(i))
+      .map((item) => cleanText(item))
       .filter(Boolean);
 
-    if (!action || !["add", "remove", "list"].includes(action) || (input.length === 0 && action !== "list")) {
-      return api.sendMessage("Invalid format. Use: ghz fav add <item> | ghz fav remove <item> | ghz fav list", threadID, messageID);
+    if (!action || !["add", "remove", "list"].includes(action) || (items.length === 0 && action !== "list")) {
+      api.sendMessage(
+        "Usage: ghz fav add Item1 | Item2\nUsage: ghz fav remove Item1 | Item2\nUsage: ghz fav list",
+        threadIDNum,
+        event.messageID
+      );
+      return;
     }
-
-    const currentFav = favoriteMap.get(threadID) || [];
 
     if (action === "list") {
-      const favDisplay = currentFav.length > 0
-        ? currentFav.map(item => `+ ${item}`).join("\n")
-        : "(No favorites yet)";
-      return api.sendMessage(`Your Favorites:\n\n${favDisplay}`, threadID, messageID);
+      const currentFavorites = favoriteMap.get(senderID) || [];
+      const favDisplay = currentFavorites.join(", ") || "(empty)";
+      api.sendMessage(`Favorite list:\n${favDisplay}`, threadIDNum, event.messageID);
+      return;
     }
 
-    const updated = new Set(currentFav);
-    for (const name of input) {
-      if (action === "add") updated.add(name);
-      else updated.delete(name);
+    const currentFavorites = new Set(favoriteMap.get(senderID) || []);
+    for (const item of items) {
+      if (action === "add") {
+        currentFavorites.add(item);
+      } else {
+        currentFavorites.delete(item);
+      }
     }
 
-    favoriteMap.set(threadID, Array.from(updated));
-    const favDisplay = Array.from(updated).map(item => `+ ${item}`).join("\n");
+    const updatedFavorites = [...currentFavorites];
+    favoriteMap.set(senderID, updatedFavorites);
 
-    if (action === "add") {
-      return api.sendMessage(`Favorites Added:\n\n${favDisplay}`, threadID, messageID);
-    } else {
-      return api.sendMessage(`Favorites Removed:\n\n${favDisplay || "(No favorites left)"}`, threadID, messageID);
-    }
-  }
-
-  if (subcmd === "off") {
-    if (!activeSessions.has(threadID)) {
-      return api.sendMessage("Not tracking. Use: ghz on", threadID, messageID);
-    }
-
-    activeSessions.delete(threadID);
-    lastSentCache.delete(threadID);
-    previousStockCache.delete(threadID);
-    favoriteMap.delete(threadID);
-    return api.sendMessage("Garden Horizon tracking stopped!", threadID, messageID);
-  }
-
-  if (subcmd === "on") {
-    if (activeSessions.has(threadID)) {
-      return api.sendMessage("Already tracking! Use: ghz off", threadID, messageID);
-    }
-
-    activeSessions.set(threadID, { api, threadID, userId: senderID });
-    await api.sendMessage("GARDEN HORIZON\n\nLive tracking started!\n\nNow receiving real-time stock market updates.", threadID, messageID);
-    ensureWebSocketConnection(activeSessions, lastSentCache, previousStockCache);
+    api.sendMessage(`Favorite list updated:\n${updatedFavorites.join(", ") || "(empty)"}`, threadIDNum, event.messageID);
     return;
   }
 
-  // Show help
-  return api.sendMessage(`GARDEN HORIZON COMMANDS
+  if (subcommand === "off") {
+    if (!activeSessions.has(sessionKey)) {
+      api.sendMessage("You do not have an active ghz session in this chat.", threadIDNum, event.messageID);
+      return;
+    }
 
-Commands:
-- ghz on - Start live tracking
-- ghz off - Stop tracking
-- ghz fav add <item> - Add favorite
-- ghz fav remove <item> - Remove favorite
-- ghz fav list - View favorites
+    activeSessions.delete(sessionKey);
+    lastSentCache.delete(sessionKey);
 
-Example: ghz fav add Carrot | Water`, threadID, messageID);
+    if (activeSessions.size === 0) {
+      closeSharedWebSocket();
+    }
+
+    api.sendMessage("Garden Horizon tracking stopped.", threadIDNum, event.messageID);
+    return;
+  }
+
+  if (subcommand !== "on") {
+    api.sendMessage(
+      [
+        "Garden Horizon commands:",
+        "ghz on - Start tracking",
+        "ghz off - Stop tracking",
+        "ghz fav add Carrot | Water",
+        "ghz fav remove Carrot",
+        "ghz fav list",
+      ].join("\n"),
+      threadIDNum,
+      event.messageID
+    );
+    return;
+  }
+
+  if (activeSessions.has(sessionKey)) {
+    api.sendMessage(`You are already tracking Garden Horizon.\nUse ghz off to stop.`, threadIDNum, event.messageID);
+    return;
+  }
+
+  if (!ensureWebSocketConnection()) {
+    api.sendMessage("WebSocket support is not available. Install the ws package.", threadIDNum, event.messageID);
+    return;
+  }
+
+  activeSessions.set(sessionKey, {
+    senderID,
+    sessionKey,
+    api,
+    threadID: threadIDNum,
+  });
+
+  lastSentCache.delete(sessionKey);
+
+  api.sendMessage("Garden Horizon tracking started.", threadIDNum, event.messageID);
 };

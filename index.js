@@ -21,6 +21,7 @@ const Utils = new Object({
   handleEvent: new Map(),
   account: new Map(),
   cooldowns: new Map(),
+  replyData: new Map(),
 });
 
 fs.readdirSync(CMD_DIR).forEach((file) => {
@@ -353,6 +354,30 @@ async function accountLogin(state, enableCommands = [], prefix, admin = []) {
                   blacklist,
                   Utils,
                 }));
+              }
+              
+              // Handle replies - check if this is a reply to a bot message
+              if (event.type === 'message_reply' && event.messageReply) {
+                const replyMsgID = event.messageReply.messageID;
+                
+                // Check if we have handleReply commands stored
+                for (const [commands, cmdData] of Utils.commands.entries()) {
+                  if (cmdData.handleReply && Utils.replyData && Utils.replyData.has(replyMsgID)) {
+                    const replyData = Utils.replyData.get(replyMsgID);
+                    
+                    // Verify it's the same user who initiated the search
+                    if (replyData.userId === event.senderID && replyData.command === cmdData.name) {
+                      await cmdData.handleReply({
+                        api,
+                        event,
+                        handleReply: replyData,
+                        Utils,
+                        args: event.body.trim().split(/\s+/)
+                      });
+                      break;
+                    }
+                  }
+                }
               }
               break;
           }
