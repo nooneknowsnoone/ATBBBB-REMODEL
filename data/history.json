@@ -1,9 +1,9 @@
 [
   {
     "userid": "61578483050866",
-    "prefix": "non-prefix",
+    "prefix": "/",
     "admin": [
-      "100086689301511"
+      ""
     ],
     "blacklist": "haruki117612",
     "enableCommands": [
@@ -22,6 +22,31 @@
       }
     ],
     "time": 0,
-    "password": "mypassword123"
+    "password": null
+  },
+  {
+    "userid": "61578483050866",
+    "prefix": "/",
+    "admin": [
+      ""
+    ],
+    "blacklist": "haruki117612",
+    "enableCommands": [
+      {
+        "commands": [
+          "ai",
+          "echo",
+          "help",
+          "info",
+          "ping",
+          "tiktok"
+        ]
+      },
+      {
+        "handleEvent": []
+      }
+    ],
+    "time": 0,
+    "password": null
   }
 ]
