@@ -1,70 +1,88 @@
+// cmd/humanize.js
+
 const axios = require("axios");
 
-module.exports.config = {
+const config = {
   name: "humanize",
-  version: "1.0",
-  hasPermssion: 1,
+  aliases: ["human", "makehuman", "convo"],
+  version: "1.0.1",
+  role: 0,                    // 0 = everyone (changed from hasPermssion:1)
+  cooldown: 5,
   credits: "VincentSensei, RY",
-  description: "Makes text sound more human-like and conversational",
-  commandCategory: "utility",
-  usages: "humanize [text] - or reply to a message",
-  cooldowns: 5,
-  role: 0
+  description: "Make text sound more natural, human-like and conversational",
+  category: "utility",
+  hasPrefix: true,
+  usage: "{pn} <text>   or   reply to a message",
+  example: "{pn} This is very formal text from AI"
 };
 
-module.exports.run = async function({ api, event, args }) {
-  const { messageID, messageReply, threadID } = event;
+async function run({ api, event, args, prefix }) {
+  const { threadID, messageID, messageReply } = event;
 
-  // Get text from either reply or direct input
-  let text = "";
+  // ─── Get input text ───────────────────────────────────────────────
+  let inputText = "";
 
-  if (messageReply) {
-    text = messageReply.body;
-  } else {
-    text = args.join(" ").trim();
+  if (messageReply?.body) {
+    inputText = messageReply.body.trim();
+  } else if (args.length > 0) {
+    inputText = args.join(" ").trim();
   }
 
-  if (!text) {
+  if (!inputText) {
     return api.sendMessage(
-      "❌ Please provide text to humanize or reply to a message.\n\n" +
-      "Example: humanize This is a formal statement that needs to be more conversational.",
+      `ℹ️  Please provide some text to humanize.\n\n` +
+      `Usage:\n` +
+      `• \( {prefix} \){config.name} This is a very robotic sentence\n` +
+      `• Reply to any message + \( {prefix} \){config.name}`,
       threadID,
       messageID
     );
   }
+
+  // ─── Show processing state ────────────────────────────────────────
+  api.setMessageReaction("⏳", messageID, () => {}, true);
 
   try {
-    // Send typing indicator
-    api.sendMessage("⏳ Humanizing your text...", threadID, messageID);
-
-    // Call the humanize API
-    const response = await axios.get(
-      `https://hutchingd-ccprojectsjonell.hf.space/api/aihuman?text=${encodeURIComponent(text)}`
+    const { data } = await axios.get(
+      `https://hutchingd-ccprojectsjonell.hf.space/api/aihuman?text=${encodeURIComponent(inputText)}`,
+      { timeout: 15000 }
     );
 
-    if (response.data && response.data.message) {
-      const humanizedText = response.data.message;
-
-      // Format the response
-      const formattedResponse =
-        `━━━━━━━━━━━━━━━━━━━━\n` +
-        `🔄 **HUMANIZED TEXT**\n` +
-        `━━━━━━━━━━━━━━━━━━━━\n\n` +
-        `${humanizedText}\n\n` +
-        `━━━━━━━━━━━━━━━━━━━━\n` +
-        `💡 Original: "${text.substring(0, 50)}${text.length > 50 ? '...' : ''}"`;
-
-      api.sendMessage(formattedResponse, threadID, messageID);
-    } else {
-      api.sendMessage("❌ Failed to humanize text. Please try again.", threadID, messageID);
+    if (!data?.message) {
+      throw new Error("No valid response from API");
     }
 
+    const humanized = data.message.trim();
+
+    const responseText = 
+      `✨ **Humanized Version**\n` +
+      `━━━━━━━━━━━━━━━━━━━\n` +
+      `${humanized}\n` +
+      `━━━━━━━━━━━━━━━━━━━\n` +
+      `Original (shortened):\n` +
+      `└─ "\( {inputText.slice(0, 80)} \){inputText.length > 80 ? "..." : ""}"`;
+
+    await api.sendMessage(responseText, threadID, messageID);
+
   } catch (error) {
-    console.error("Error in humanize command:", error);
-    api.sendMessage(
-      "❌ An error occurred while humanizing your text. Please try again later.",
-      threadID,
-      messageID
-    );
+    console.error("[humanize]", error.message);
+
+    let errMsg = "❌ Sorry, something went wrong while humanizing the text.";
+
+    if (error.code === "ECONNABORTED") {
+      errMsg = "❌ The humanize service took too long to respond (timeout).";
+    } else if (error.response) {
+      errMsg = `❌ API error: ${error.response.status} - ${error.message}`;
+    }
+
+    api.sendMessage(errMsg, threadID, messageID);
+  } finally {
+    // Optional: remove reaction after done
+    api.setMessageReaction("", messageID, () => {}, true);
   }
+}
+
+module.exports = {
+  config,
+  run
 };
