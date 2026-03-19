@@ -5,24 +5,25 @@ const path = require("path");
 const TIKTOK_API = 'https://ccprojectapis.ddns.net/api/tiktok/searchvideo';
 const CACHE_DIR = path.join(__dirname, 'cache');
 
-module.exports.config = {
+const config = {
   name: "tiktok",
   version: "1.0.0",
-  hasPermssion: 0,
+  role: 0,                      // 0 = everyone (changed from hasPermssion:0)
+  cooldown: 5,                   // changed from cooldowns:5
   credits: "Kim Joseph DG Bien - REMAKE BY JONELL",
   description: "Search and download TikTok video",
-  commandCategory: "media",
-  usages: "<search>",
-  cooldowns: 5,
-  role: 0
+  category: "media",             // changed from commandCategory: "media"
+  hasPrefix: true,
+  usage: "{pn} <search>",
+  example: "{pn} funny cats"
 };
 
-module.exports.run = async function({ api, event, args }) {
+async function run({ api, event, args, prefix }) {
   const { threadID, messageID } = event;
   const searchQuery = args.join(" ");
 
   if (!searchQuery) {
-    api.sendMessage("Usage: tiktok <search text>", threadID, messageID);
+    api.sendMessage(`Usage: ${prefix}${config.name} <search text>`, threadID, messageID);
     return;
   }
 
@@ -41,12 +42,10 @@ module.exports.run = async function({ api, event, args }) {
     const videoData = videos[0];
     const videoUrl = videoData.play;
 
-    const message = `TikTok Result:
-
-Posted by: ${videoData.author.nickname}
-Username: @${videoData.author.unique_id}
-
-Title: ${videoData.title}`;
+    const message = `TikTok Result:\n\n` +
+      `Posted by: ${videoData.author.nickname}\n` +
+      `Username: @${videoData.author.unique_id}\n\n` +
+      `Title: ${videoData.title}`;
 
     await api.unsendMessage(loadingMsg.messageID);
 
@@ -76,7 +75,7 @@ Title: ${videoData.title}`;
       (err) => {
         // Clean up file after sending
         fs.unlink(filePath).catch(console.error);
-        
+
         if (err) {
           console.error("Send video error:", err);
           api.sendMessage("Failed to send video. The file may be too large.", threadID, messageID);
@@ -89,4 +88,9 @@ Title: ${videoData.title}`;
     console.error("TikTok Error:", error.message);
     api.sendMessage("Error: " + error.message, threadID, messageID);
   }
+}
+
+module.exports = {
+  config,
+  run
 };
