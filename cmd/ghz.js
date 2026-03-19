@@ -1,9 +1,24 @@
 const WebSocket = require("ws");
 
+const config = {
+  name: "ghz",
+  version: "1.0.0",
+  role: 0,                      // 0 = everyone (changed from hasPermssion:0)
+  cooldown: 3,                   // changed from cooldowns:3
+  credits: "Garden Horizon",
+  description: "Garden Horizon live stock tracker using WebSocket",
+  category: "tools",             // changed from commandCategory: "tools"
+  hasPrefix: true,
+  usage: "{pn} on | {pn} off | {pn} fav add <item> | {pn} fav remove <item>",
+  example: "{pn} fav add Carrot | Water\n{pn} fav list"
+};
+
+// Constants
 const SOCKET_URL = "wss://ghz.indevs.in/ghz";
 const KEEP_ALIVE_INTERVAL_MS = 10000;
 const RECONNECT_DELAY_MS = 3000;
 
+// State variables
 let sharedWebSocket = null;
 let keepAliveInterval = null;
 let reconnectTimeout = null;
@@ -12,6 +27,7 @@ const activeSessions = new Map();
 const lastSentCache = new Map();
 const favoriteMap = new Map();
 
+// Helper functions
 function resolveWebSocketCtor() {
   if (typeof globalThis.WebSocket === "function") {
     return globalThis.WebSocket;
@@ -257,23 +273,13 @@ function ensureWebSocketConnection() {
   return true;
 }
 
-module.exports.config = {
-  name: "ghz",
-  version: "1.0.0",
-  hasPermssion: 0,
-  credits: "Garden Horizon",
-  description: "Garden Horizon live stock tracker using WebSocket",
-  commandCategory: "tools",
-  usages: "ghz on | ghz off | ghz fav add <item> | ghz fav remove <item>",
-  cooldowns: 3,
-  role: 0
-};
-
-module.exports.run = async function({ api, event, args }) {
-  const senderID = String(event.senderID);
-  const threadID = String(event.threadID);
-  const threadIDNum = event.threadID;
-  const sessionKey = getSessionKey(senderID, threadID);
+// Main command function
+async function run({ api, event, args, prefix }) {
+  const { threadID, messageID, senderID } = event;
+  
+  const senderIDStr = String(senderID);
+  const threadIDStr = String(threadID);
+  const sessionKey = getSessionKey(senderIDStr, threadIDStr);
   const subcommand = cleanText(args[0]);
 
   if (subcommand === "fav") {
@@ -288,20 +294,20 @@ module.exports.run = async function({ api, event, args }) {
     if (!action || !["add", "remove", "list"].includes(action) || (items.length === 0 && action !== "list")) {
       api.sendMessage(
         "Usage: ghz fav add Item1 | Item2\nUsage: ghz fav remove Item1 | Item2\nUsage: ghz fav list",
-        threadIDNum,
-        event.messageID
+        threadID,
+        messageID
       );
       return;
     }
 
     if (action === "list") {
-      const currentFavorites = favoriteMap.get(senderID) || [];
+      const currentFavorites = favoriteMap.get(senderIDStr) || [];
       const favDisplay = currentFavorites.join(", ") || "(empty)";
-      api.sendMessage(`Favorite list:\n${favDisplay}`, threadIDNum, event.messageID);
+      api.sendMessage(`Favorite list:\n${favDisplay}`, threadID, messageID);
       return;
     }
 
-    const currentFavorites = new Set(favoriteMap.get(senderID) || []);
+    const currentFavorites = new Set(favoriteMap.get(senderIDStr) || []);
     for (const item of items) {
       if (action === "add") {
         currentFavorites.add(item);
@@ -311,15 +317,15 @@ module.exports.run = async function({ api, event, args }) {
     }
 
     const updatedFavorites = [...currentFavorites];
-    favoriteMap.set(senderID, updatedFavorites);
+    favoriteMap.set(senderIDStr, updatedFavorites);
 
-    api.sendMessage(`Favorite list updated:\n${updatedFavorites.join(", ") || "(empty)"}`, threadIDNum, event.messageID);
+    api.sendMessage(`Favorite list updated:\n${updatedFavorites.join(", ") || "(empty)"}`, threadID, messageID);
     return;
   }
 
   if (subcommand === "off") {
     if (!activeSessions.has(sessionKey)) {
-      api.sendMessage("You do not have an active ghz session in this chat.", threadIDNum, event.messageID);
+      api.sendMessage("You do not have an active ghz session in this chat.", threadID, messageID);
       return;
     }
 
@@ -330,7 +336,7 @@ module.exports.run = async function({ api, event, args }) {
       closeSharedWebSocket();
     }
 
-    api.sendMessage("Garden Horizon tracking stopped.", threadIDNum, event.messageID);
+    api.sendMessage("Garden Horizon tracking stopped.", threadID, messageID);
     return;
   }
 
@@ -338,36 +344,41 @@ module.exports.run = async function({ api, event, args }) {
     api.sendMessage(
       [
         "Garden Horizon commands:",
-        "ghz on - Start tracking",
-        "ghz off - Stop tracking",
-        "ghz fav add Carrot | Water",
-        "ghz fav remove Carrot",
-        "ghz fav list",
+        `• ${prefix}ghz on - Start tracking`,
+        `• ${prefix}ghz off - Stop tracking`,
+        `• ${prefix}ghz fav add Carrot | Water`,
+        `• ${prefix}ghz fav remove Carrot`,
+        `• ${prefix}ghz fav list`,
       ].join("\n"),
-      threadIDNum,
-      event.messageID
+      threadID,
+      messageID
     );
     return;
   }
 
   if (activeSessions.has(sessionKey)) {
-    api.sendMessage(`You are already tracking Garden Horizon.\nUse ghz off to stop.`, threadIDNum, event.messageID);
+    api.sendMessage(`You are already tracking Garden Horizon.\nUse ghz off to stop.`, threadID, messageID);
     return;
   }
 
   if (!ensureWebSocketConnection()) {
-    api.sendMessage("WebSocket support is not available. Install the ws package.", threadIDNum, event.messageID);
+    api.sendMessage("WebSocket support is not available. Install the ws package.", threadID, messageID);
     return;
   }
 
   activeSessions.set(sessionKey, {
-    senderID,
+    senderID: senderIDStr,
     sessionKey,
     api,
-    threadID: threadIDNum,
+    threadID,
   });
 
   lastSentCache.delete(sessionKey);
 
-  api.sendMessage("Garden Horizon tracking started.", threadIDNum, event.messageID);
+  api.sendMessage("Garden Horizon tracking started.", threadID, messageID);
+}
+
+module.exports = {
+  config,
+  run
 };
