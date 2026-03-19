@@ -8,23 +8,24 @@ const pipeline = promisify(stream.pipeline);
 const API_ENDPOINT = "https://free-goat-api.onrender.com/4k";
 const CACHE_DIR = path.join(__dirname, 'cache');
 
-module.exports.config = {
+const config = {
   name: "4k",
   aliases: ["upscale", "hd", "enhance"],
   version: "1.0",
-  hasPermssion: 0,
+  role: 0,                      // 0 = everyone (changed from hasPermssion:0)
+  cooldown: 15,                  // changed from cooldowns:15
   credits: "NeoKEX",
   description: "Upscales an image to higher resolution (4K) using AI",
-  commandCategory: "image",
-  usages: "<image_url> or reply to an image",
-  cooldowns: 15,
-  role: 0
+  category: "image",             // changed from commandCategory: "image"
+  hasPrefix: true,
+  usage: "{pn} <image_url>   or   reply to an image",
+  example: "{pn} https://example.com/image.jpg"
 };
 
 function extractImageUrl(args, event) {
   // Check if URL is in arguments
   let imageUrl = args.find(arg => arg.startsWith('http'));
-  
+
   // Check if replying to an image
   if (!imageUrl && event.messageReply && event.messageReply.attachments && event.messageReply.attachments.length > 0) {
     const imageAttachment = event.messageReply.attachments.find(att => att.type === 'photo' || att.type === 'image');
@@ -35,9 +36,9 @@ function extractImageUrl(args, event) {
   return imageUrl;
 }
 
-module.exports.run = async function({ api, event, args }) {
+async function run({ api, event, args, prefix }) {
   const { threadID, messageID } = event;
-  
+
   // Get image URL from args or reply
   const imageUrl = extractImageUrl(args, event);
 
@@ -92,7 +93,7 @@ module.exports.run = async function({ api, event, args }) {
 
   } catch (error) {
     let errorMessage = "❌ Failed to upscale image. An error occurred.";
-    
+
     if (error.response) {
       if (error.response.status === 400) {
         errorMessage = "❌ Error: The provided URL might be invalid or the image is too small/large.";
@@ -114,4 +115,9 @@ module.exports.run = async function({ api, event, args }) {
       fs.unlink(tempFilePath).catch(console.error);
     }
   }
+}
+
+module.exports = {
+  config,
+  run
 };
