@@ -3,7 +3,7 @@ const axios = require("axios");
 module.exports.config = {
   name: "humanize",
   version: "1.0",
-  hasPermssion: 0,
+  hasPermssion: 2,
   credits: "VincentSensei, RY",
   description: "Makes text sound more human-like and conversational",
   commandCategory: "utility",
