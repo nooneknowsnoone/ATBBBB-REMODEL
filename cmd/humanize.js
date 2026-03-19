@@ -6,7 +6,7 @@ const config = {
   name: "humanize",
   aliases: ["human", "makehuman", "convo"],
   version: "1.0.1",
-  role: 0,                    // 0 = everyone (changed from hasPermssion:1)
+  role: 1,                    // 0 = everyone (changed from hasPermssion:1)
   cooldown: 5,
   credits: "VincentSensei, RY",
   description: "Make text sound more natural, human-like and conversational",
