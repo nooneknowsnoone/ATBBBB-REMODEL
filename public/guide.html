@@ -1,492 +1,84 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <title>Guide - VINCENTSENSEI</title>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --primary: #ff00ff;
-      --secondary: #00ffff;
-      --tertiary: #ffff00;
-      --quaternary: #ff0000;
-      --bg-dark: #0a0a0f;
-      --glass: rgba(255, 255, 255, 0.05);
-      --glass-border: rgba(255, 255, 255, 0.1);
-    }
-    
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-    
-    body {
-      font-family: 'Rajdhani', sans-serif;
-      background: var(--bg-dark);
-      min-height: 100vh;
-      overflow-x: hidden;
-      perspective: 1000px;
-    }
-    
-    /* Animated Background */
-    .bg-animation {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: -1;
-      overflow: hidden;
-    }
-    
-    .bg-animation::before {
-      content: '';
-      position: absolute;
-      top: -50%;
-      left: -50%;
-      width: 200%;
-      height: 200%;
-      background: 
-        radial-gradient(ellipse at 20% 20%, rgba(255, 255, 0, 0.3) 0%, transparent 50%),
-        radial-gradient(ellipse at 80% 20%, rgba(255, 0, 255, 0.3) 0%, transparent 50%),
-        radial-gradient(ellipse at 20% 80%, rgba(0, 255, 255, 0.2) 0%, transparent 50%),
-        radial-gradient(ellipse at 80% 80%, rgba(255, 0, 0, 0.2) 0%, transparent 50%);
-      animation: bgPulse 15s ease-in-out infinite;
-    }
-    
-    @keyframes bgPulse {
-      0%, 100% { transform: translate(0, 0) rotate(0deg); }
-      25% { transform: translate(5%, 5%) rotate(5deg); }
-      50% { transform: translate(0, 10%) rotate(0deg); }
-      75% { transform: translate(-5%, 5%) rotate(-5deg); }
-    }
-    
-    /* Floating Orbs */
-    .orb {
-      position: absolute;
-      border-radius: 50%;
-      filter: blur(60px);
-      animation: float 20s infinite ease-in-out;
-      opacity: 0.5;
-    }
-    
-    .orb-1 {
-      width: 400px;
-      height: 400px;
-      background: linear-gradient(45deg, var(--tertiary), var(--primary));
-      top: 10%;
-      left: 10%;
-      animation-delay: 0s;
-    }
-    
-    .orb-2 {
-      width: 300px;
-      height: 300px;
-      background: linear-gradient(45deg, var(--secondary), var(--quaternary));
-      top: 60%;
-      right: 10%;
-      animation-delay: -5s;
-    }
-    
-    @keyframes float {
-      0%, 100% { transform: translate(0, 0) scale(1); }
-      25% { transform: translate(30px, -30px) scale(1.1); }
-      50% { transform: translate(-20px, 20px) scale(0.9); }
-      75% { transform: translate(20px, 30px) scale(1.05); }
-    }
-    
-    /* Main Container */
-    .container {
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-start;
-      padding: 100px 20px 20px;
-      position: relative;
-    }
-    
-    /* Title */
-    .title {
-      font-family: 'Orbitron', sans-serif;
-      font-size: 2.5rem;
-      font-weight: 800;
-      text-align: center;
-      margin-bottom: 40px;
-      background: linear-gradient(90deg, var(--tertiary), var(--primary), var(--secondary), var(--tertiary));
-      background-size: 300% 100%;
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      animation: rainbow 5s linear infinite;
-      text-shadow: 0 0 30px rgba(255, 255, 0, 0.5);
-      letter-spacing: 3px;
-    }
-    
-    @keyframes rainbow {
-      0% { background-position: 0% 50%; }
-      100% { background-position: 300% 50%; }
-    }
-    
-    /* Steps */
-    .steps-container {
-      display: flex;
-      flex-direction: column;
-      gap: 25px;
-      width: 100%;
-      max-width: 800px;
-    }
-    
-    .step-card {
-      background: var(--glass);
-      backdrop-filter: blur(20px);
-      border: 1px solid var(--glass-border);
-      border-radius: 25px;
-      padding: 30px;
-      display: flex;
-      align-items: flex-start;
-      gap: 25px;
-      transform-style: preserve-3d;
-      transition: all 0.4s ease;
-      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
-    }
-    
-    .step-card:hover {
-      transform: translateX(10px);
-      box-shadow: 
-        0 20px 40px rgba(0, 0, 0, 0.4),
-        0 0 30px rgba(255, 255, 0, 0.2);
-      border-color: var(--tertiary);
-    }
-    
-    .step-number {
-      font-family: 'Orbitron', sans-serif;
-      font-size: 2rem;
-      font-weight: 800;
-      color: var(--tertiary);
-      text-shadow: 0 0 20px var(--tertiary);
-      min-width: 60px;
-    }
-    
-    .step-content h3 {
-      font-family: 'Orbitron', sans-serif;
-      font-size: 1.3rem;
-      color: #fff;
-      margin-bottom: 12px;
-    }
-    
-    .step-content p {
-      color: rgba(255, 255, 255, 0.7);
-      font-size: 1rem;
-      line-height: 1.6;
-    }
-    
-    .step-content ul {
-      margin-top: 10px;
-      padding-left: 20px;
-      color: rgba(255, 255, 255, 0.6);
-    }
-    
-    .step-content li {
-      margin-bottom: 5px;
-    }
-    
-    .step-content code {
-      background: rgba(0, 0, 0, 0.5);
-      padding: 2px 8px;
-      border-radius: 5px;
-      color: var(--secondary);
-      font-family: monospace;
-    }
-    
-    /* Features */
-    .features-section {
-      margin-top: 50px;
-      width: 100%;
-      max-width: 800px;
-    }
-    
-    .section-title {
-      font-family: 'Orbitron', sans-serif;
-      font-size: 1.8rem;
-      color: var(--secondary);
-      text-align: center;
-      margin-bottom: 30px;
-      text-shadow: 0 0 20px var(--secondary);
-    }
-    
-    .features-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 20px;
-    }
-    
-    .feature-card {
-      background: var(--glass);
-      backdrop-filter: blur(20px);
-      border: 1px solid var(--glass-border);
-      border-radius: 20px;
-      padding: 25px;
-      text-align: center;
-      transition: all 0.3s ease;
-    }
-    
-    .feature-card:hover {
-      transform: translateY(-10px);
-      border-color: var(--primary);
-      box-shadow: 0 0 30px rgba(255, 0, 255, 0.3);
-    }
-    
-    .feature-card i {
-      font-size: 2.5rem;
-      margin-bottom: 15px;
-      background: linear-gradient(135deg, var(--primary), var(--secondary));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-    
-    .feature-card h4 {
-      font-family: 'Orbitron', sans-serif;
-      font-size: 1rem;
-      color: #fff;
-      margin-bottom: 8px;
-    }
-    
-    .feature-card p {
-      color: rgba(255, 255, 255, 0.6);
-      font-size: 0.9rem;
-    }
-    
-    /* Navbar */
-    .navbar {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      padding: 15px 30px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background: rgba(0, 0, 0, 0.5);
-      backdrop-filter: blur(10px);
-      z-index: 100;
-    }
-    
-    .nav-logo {
-      font-family: 'Orbitron', sans-serif;
-      font-size: 1.2rem;
-      font-weight: 700;
-      background: linear-gradient(90deg, var(--primary), var(--secondary));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-    
-    .nav-links {
-      display: flex;
-      gap: 20px;
-    }
-    
-    .nav-link {
-      color: rgba(255, 255, 255, 0.7);
-      text-decoration: none;
-      font-weight: 600;
-      transition: all 0.3s ease;
-    }
-    
-    .nav-link:hover {
-      color: var(--tertiary);
-      text-shadow: 0 0 10px var(--tertiary);
-    }
-    
-    .nav-link.active {
-      color: var(--tertiary);
-    }
-    
-    /* Footer */
-    .footer {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      padding: 15px;
-      text-align: center;
-      color: rgba(255, 255, 255, 0.5);
-      font-size: 0.85rem;
-      background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
-    }
-    
-    /* Mobile Responsive */
-    @media (max-width: 768px) {
-      .title {
-        font-size: 1.8rem;
-      }
-      
-      .step-card {
-        padding: 20px;
-        flex-direction: column;
-      }
-      
-      .step-number {
-        font-size: 1.5rem;
-      }
-      
-      .features-grid {
-        grid-template-columns: 1fr;
-      }
-      
-      .navbar {
-        padding: 10px 15px;
-      }
-      
-      .nav-links {
-        gap: 10px;
-      }
-    }
-  </style>
-</head>
-<body>
-  <!-- Animated Background -->
-  <div class="bg-animation">
-    <div class="orb orb-1"></div>
-    <div class="orb orb-2"></div>
-  </div>
-  
-  <!-- Navbar -->
-  <nav class="navbar">
-    <div class="nav-logo">VINCENTSENSEI</div>
-    <div class="nav-links">
-      <a href="/" class="nav-link">Home</a>
-      <a href="/active" class="nav-link">Active</a>
-      <a href="/guide" class="nav-link active">Guide</a>
-    </div>
-  </nav>
-  
-  <div class="container">
-    <h1 class="title">How to Use</h1>
-    
-    <div class="steps-container">
-      <div class="step-card">
-        <div class="step-number">01</div>
-        <div class="step-content">
-          <h3>Get Facebook Appstate</h3>
-          <p>You need to obtain your Facebook appstate (cookies) to login. You can use tools like:</p>
-          <ul>
-            <li>Facebook Cookie Extractor</li>
-            <li>Browser DevTools</li>
-            <li>Third-party cookie tools</li>
-          </ul>
-        </div>
+   <head>
+      <title>Step-By-Step Guide</title>
+      <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <link rel="stylesheet" href="styles.css">
+   </head>
+   <body>
+      <nav class="navbar navbar-expand-lg navbar-light bg-light">
+         <a class="navbar-brand" href="#">Step-By-Step Guide </a>
+         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+         <span class="navbar-toggler-icon"></span>
+         </button>
+         <div class="collapse navbar-collapse justify-content-end" id="navbarNav" style="margin-right: 70px;">
+            <ul class="navbar-nav">
+               <li class="nav-item active">
+                  <a class="nav-link" href="#">Step-By-Step Guide <span class="sr-only">(current)</span>
+                  </a>
+               </li>
+               <li class="nav-item">
+                  <a class="nav-link" href="/">Home</a>
+               </li>
+               <li class="nav-item dropdown">
+                  <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> Features </a>
+                  <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                     <a class="dropdown-item" href="#">Cookies Extractor</a>
+                     <div class="dropdown-divider"></div>
+                     <a class="dropdown-item" href="/step_by_step_guide">Step-By-Step Guide</a>
+                  </div>
+               </li>
+               <li class="nav-item">
+                  <a class="nav-link" href="online_user">Active</a>
+               </li>
+            </ul>
+         </div>
+      </nav>
+      <div class="container">
+         <h1 class="col text-center" style="font-size: 20px; padding: 10px;">Step-By-Step Guide</h1>
+         <p>1. Install the Kiwi Browser from the Google Play Store and proceed to launch the application.</p>
+         <img src="image/guide_1.jpeg" alt="" width="300" height="200" style="display: block; margin: auto; border-radius: 10px; margin: 10px auto;">
+         <p>2. Upon launching the app, navigate to the search function and enter the following link: <a href="https://github.com/c3cbot/c3c-fbstate/archive/refs/tags/1.5.zip">https://github.com/c3cbot/c3c-fbstate/archive/refs/tags/1.5.zip</a></p>
+         <img src="image/guide_2.jpeg" alt="" width="300" height="200" style="display: block; margin: auto; border-radius: 10px; margin: 10px auto;">
+         <p>3. Once entered, a prompt will appear instructing you to download the file; proceed by clicking the download option.</p>
+         <img src="image/guide_3.jpeg" alt="" width="300" height="200" style="display: block; margin: auto; border-radius: 10px; margin: 10px auto;">
+         <p>4. After completing the download, tap the three dots in the upper-right corner, then select the "Extensions" option.</p>
+         <img src="image/guide_4.jpeg" alt="" width="300" height="200" style="display: block; margin: auto; border-radius: 10px; margin: 10px auto;">
+         <p>5. In the Extensions menu, enable Developer Mode, then click the "+" button to add the extension from either a zip file, crx file, or user.js file.</p>
+         <img src="image/guide_5.jpeg" alt="" width="300" height="200" style="display: block; margin: auto; border-radius: 10px; margin: 10px auto;">
+         <p>6. Locate the previously downloaded zip file and click on it to initiate the installation process.</p>
+         <img src="image/guide_6.jpeg" alt="" width="300" height="200" style="display: block; margin: auto; border-radius: 10px; margin: 10px auto;">
+         <p>7. Once the installation is complete, observe the C3C fbstate utility in the bottom-right corner and activate it by clicking on it.</p>
+         <img src="image/guide_7.jpeg" alt="" width="300" height="200" style="display: block; margin: auto; border-radius: 10px; margin: 10px auto;">
+         <p>8. Upon activation, navigate to Facebook.com using the Kiwi Browser and log in your account.</p>
+         <img src="image/guide_8.jpeg" alt="" width="300" height="200" style="display: block; margin: auto; border-radius: 10px; margin: 10px auto;">
+         <p>9. After logging in, access the menu by clicking the three dots in the upper right corner, scroll down, and locate the C3C fbstate utility.</p>
+         <img src="image/guide_9.jpeg" alt="" width="300" height="200" style="display: block; margin: auto; border-radius: 10px; margin: 10px auto;">
+         <p>10. You'll be redirected to another page; locate the "Copy Clipboard" option and click it to copy your cookies for further use.</p>
+         <img src="image/guide_10.jpeg" alt="" width="300" height="200" style="display: block; margin: auto; border-radius: 10px; margin: 10px auto;">
+         <p>11. Paste your copied cookies at <a href="https://auto-bot-soyeon.onrender.com">https://auto-bot-soyeon.onrender.com</a>, then scroll down to thoroughly review the Terms and Conditions and Privacy Policy.</p>
+         <img src="image/guide_11.jpeg" alt="" width="300" height="200" style="display: block; margin: auto; border-radius: 10px; margin: 10px auto;">
+         <p>12. Finally, having carefully reviewed the Terms and Conditions and Privacy Policy, check the box to confirm your understanding and submit the information.</p>
+         <img src="image/guide_12.jpeg" alt="" width="300" height="200" style="display: block; margin: auto; border-radius: 10px; margin: 10px auto;">
+         <p>13. Certainly, please input "ai" to confirm the bot's operational status. If it responds, congratulations on successful verification.</p>
+         <img src="image/guide_13.jpeg" alt="" width="300" height="200" style="display: block; margin: auto; border-radius: 10px; margin: 10px auto;">
+         <br>
+         <h1 class="col text-center" style="font-size: 20px;">Note:</h1>
+         <p>• In case the bot encounters a login issue during the initial log, it may be due to a lock. Simply unlock it and repeat the process.</p>
+         <p>• If the bot is already logged into Facebook/FB Lite, refrain from logging in on other devices or initiating a logout.</p>
+         <p>• While the bot is active, avoid logging into the bot account or changing the password.</p>
+         <p>• Please be aware that there is a possibility of encountering account locks or suspensions, and we are not responsible for such occurrences.</p>
+         <p>• Please be aware that there is a possibility of encountering account locks or suspensions, and we are not responsible for such occurrences.</p>
+         <p> To register another bot/Al, simply tap on "logout" (not die appstate) to acquire a new appstate for another account.</p>
+         <img src="image/guide_16.jpeg" alt="" width="300" height="200" style="display: block; margin: auto; border-radius: 10px; margin: 10px auto;">
       </div>
-      
-      <div class="step-card">
-        <div class="step-number">02</div>
-        <div class="step-content">
-          <h3>Paste Appstate</h3>
-          <p>Copy your entire appstate JSON and paste it into the text area on the homepage. Make sure it's valid JSON format.</p>
-        </div>
       </div>
-      
-      <div class="step-card">
-        <div class="step-number">03</div>
-        <div class="step-content">
-          <h3>Configure Bot Settings</h3>
-          <p>Choose which commands to enable:</p>
-          <ul>
-            <li><code>ping</code> - Check bot response time</li>
-            <li><code>help</code> - Show help information</li>
-            <li><code>info</code> - Bot statistics</li>
-            <li><code>echo</code> - Repeat messages</li>
-            <li><code>ai</code> - AI chatbot</li>
-            <li><code>tiktok</code> - TikTok downloader</li>
-          </ul>
-          <p>Set a command prefix (default is <code>/</code>)</p>
-        </div>
-      </div>
-      
-      <div class="step-card">
-        <div class="step-number">04</div>
-        <div class="step-content">
-          <h3>Add Admin (Optional)</h3>
-          <p>Enter your Facebook User ID if you want admin privileges. Otherwise, leave it blank.</p>
-        </div>
-      </div>
-      
-      <div class="step-card">
-        <div class="step-number">05</div>
-        <div class="step-content">
-          <h3>Login Bot</h3>
-          <p>Check the terms checkbox and click "Login Bot". Your bot will connect to Facebook Messenger!</p>
-        </div>
-      </div>
-    </div>
-    
-    <div class="features-section">
-      <h2 class="section-title">Bot Features</h2>
-      <div class="features-grid">
-        <div class="feature-card">
-          <i class="fas fa-bolt"></i>
-          <h4>Fast Response</h4>
-          <p>Lightning quick message handling</p>
-        </div>
-        <div class="feature-card">
-          <i class="fas fa-shield-alt"></i>
-          <h4>Secure</h4>
-          <p>Safe appstate storage</p>
-        </div>
-        <div class="feature-card">
-          <i class="fas fa-brain"></i>
-          <h4>AI Powered</h4>
-          <p>Smart chatbot responses</p>
-        </div>
-        <div class="feature-card">
-          <i class="fas fa-download"></i>
-          <h4>Media Download</h4>
-          <p>Download TikTok videos</p>
-        </div>
-      </div>
-    </div>
-  </div>
-  
-  <div class="footer">
-    <span id="time"></span> | <span id="ping"></span> | VINCENTSENSEI © 2024
-  </div>
-  
-  <script>
-    function updateTime() {
-      const now = new Date();
-      const options = {
-        timeZone: 'Asia/Manila',
-        hour12: true,
-        hour: 'numeric',
-        minute: 'numeric',
-        second: 'numeric'
-      };
-      const formattedTime = now.toLocaleString('en-US', options);
-      document.getElementById('time').textContent = formattedTime;
-    }
-    updateTime();
-    setInterval(updateTime, 1000);
-    
-    function measurePing() {
-      var xhr = new XMLHttpRequest();
-      var startTime, endTime;
-      xhr.onreadystatechange = function() {
-        if (xhr.readyState === 4) {
-          endTime = Date.now();
-          var pingTime = endTime - startTime;
-          document.getElementById("ping").textContent = pingTime + " ms";
-        }
-      };
-      xhr.open("GET", location.href + "?t=" + new Date().getTime());
-      startTime = Date.now();
-      xhr.send();
-    }
-    setInterval(measurePing, 1000);
-  </script>
-</body>
+      <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+      <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
+   </body>
 </html>
