@@ -1,616 +1,507 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <title>VINCENTSENSEI - Facebook Bot</title>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --primary: #ff00ff;
-      --secondary: #00ffff;
-      --tertiary: #ffff00;
-      --quaternary: #ff0000;
-      --bg-dark: #0a0a0f;
-      --glass: rgba(255, 255, 255, 0.05);
-      --glass-border: rgba(255, 255, 255, 0.1);
-    }
+  <title>VINCENTSENSEI - Facebook Messenger Bot</title>
 
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    * { transition: background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease; }
 
     body {
-      font-family: 'Rajdhani', sans-serif;
-      background: var(--bg-dark);
-      min-height: 100vh;
-      overflow-x: hidden;
-      perspective: 1000px;
+      padding: 10px;
+      font-family: 'Poppins', sans-serif;
+      background-color: #f8f9fa;
+      color: #212529;
+      margin-bottom: 90px;
     }
 
-    /* Animated Background */
-    .bg-animation {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: -1;
-      overflow: hidden;
+    body.dark-mode {
+      background-color: #121212;
+      color: #e0e0e0;
     }
 
-    .bg-animation::before {
-      content: '';
-      position: absolute;
-      top: -50%;
-      left: -50%;
-      width: 200%;
-      height: 200%;
-      background: 
-        radial-gradient(ellipse at 20% 20%, rgba(255, 0, 255, 0.3) 0%, transparent 50%),
-        radial-gradient(ellipse at 80% 20%, rgba(0, 255, 255, 0.3) 0%, transparent 50%),
-        radial-gradient(ellipse at 20% 80%, rgba(255, 255, 0, 0.2) 0%, transparent 50%),
-        radial-gradient(ellipse at 80% 80%, rgba(255, 0, 0, 0.2) 0%, transparent 50%);
-      animation: bgPulse 15s ease-in-out infinite;
-    }
-
-    @keyframes bgPulse {
-      0%, 100% { transform: translate(0, 0) rotate(0deg); }
-      25% { transform: translate(5%, 5%) rotate(5deg); }
-      50% { transform: translate(0, 10%) rotate(0deg); }
-      75% { transform: translate(-5%, 5%) rotate(-5deg); }
-    }
-
-    /* Floating Orbs */
-    .orb {
-      position: absolute;
-      border-radius: 50%;
-      filter: blur(60px);
-      animation: float 20s infinite ease-in-out;
-      opacity: 0.5;
-    }
-
-    .orb-1 {
-      width: 400px;
-      height: 400px;
-      background: linear-gradient(45deg, var(--primary), var(--secondary));
-      top: 10%;
-      left: 10%;
-      animation-delay: 0s;
-    }
-
-    .orb-2 {
-      width: 300px;
-      height: 300px;
-      background: linear-gradient(45deg, var(--tertiary), var(--primary));
-      top: 60%;
-      right: 10%;
-      animation-delay: -5s;
-    }
-
-    .orb-3 {
-      width: 250px;
-      height: 250px;
-      background: linear-gradient(45deg, var(--secondary), var(--quaternary));
-      bottom: 20%;
-      left: 30%;
-      animation-delay: -10s;
-    }
-
-    @keyframes float {
-      0%, 100% { transform: translate(0, 0) scale(1); }
-      25% { transform: translate(30px, -30px) scale(1.1); }
-      50% { transform: translate(-20px, 20px) scale(0.9); }
-      75% { transform: translate(20px, 30px) scale(1.05); }
-    }
-
-    /* Main Container */
-    .container {
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
+    /* Mas maliit na spacing sa pagitan ng sections */
+    .container, .section-card {
+      background-color: #ffffff;
+      border-radius: 16px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.05);
       padding: 20px;
-      position: relative;
+      margin-top: 12px !important;
+      margin-bottom: 12px !important;
+      border: 1px solid rgba(0,0,0,0.05);
     }
 
-    /* 3D Card */
-    .main-card {
-      background: var(--glass);
-      backdrop-filter: blur(20px);
-      border: 1px solid var(--glass-border);
-      border-radius: 30px;
-      padding: 40px;
-      width: 100%;
-      max-width: 600px;
-      transform-style: preserve-3d;
-      transform: rotateX(5deg);
-      box-shadow: 
-        0 25px 50px rgba(0, 0, 0, 0.5),
-        0 0 100px rgba(255, 0, 255, 0.2),
-        inset 0 0 50px rgba(255, 255, 255, 0.05);
-      animation: cardFloat 6s ease-in-out infinite;
+    body.dark-mode .container,
+    body.dark-mode .section-card {
+      background-color: #1e1e1e;
+      box-shadow: 0 0 15px rgba(0,0,0,0.5);
+      border-color: #333;
     }
 
-    @keyframes cardFloat {
-      0%, 100% { transform: rotateX(5deg) translateY(0); }
-      50% { transform: rotateX(5deg) translateY(-10px); }
-    }
-
-    .main-card:hover {
-      transform: rotateX(0deg) scale(1.02);
-      box-shadow: 
-        0 30px 60px rgba(0, 0, 0, 0.5),
-        0 0 150px rgba(0, 255, 255, 0.3),
-        inset 0 0 50px rgba(255, 255, 255, 0.05);
-    }
-
-    /* Title */
-    .title {
-      font-family: 'Orbitron', sans-serif;
-      font-size: 2.5rem;
-      font-weight: 800;
-      text-align: center;
-      margin-bottom: 10px;
-      background: linear-gradient(90deg, var(--primary), var(--secondary), var(--tertiary), var(--primary));
-      background-size: 300% 100%;
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      animation: rainbow 5s linear infinite;
-      text-shadow: 0 0 30px rgba(255, 0, 255, 0.5);
-      letter-spacing: 3px;
-    }
-
-    @keyframes rainbow {
-      0% { background-position: 0% 50%; }
-      100% { background-position: 300% 50%; }
-    }
-
-    .subtitle {
-      text-align: center;
-      color: rgba(255, 255, 255, 0.6);
-      font-size: 1rem;
-      margin-bottom: 30px;
-      letter-spacing: 2px;
-    }
-
-    /* Form Elements */
-    .form-group {
-      margin-bottom: 20px;
-      transform: translateZ(20px);
-    }
-
-    .form-label {
-      display: block;
-      color: var(--secondary);
-      font-size: 0.9rem;
-      margin-bottom: 8px;
-      font-weight: 600;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-    }
-
-    .form-input, .form-textarea {
-      width: 100%;
-      padding: 15px 20px;
-      background: rgba(0, 0, 0, 0.4);
-      border: 2px solid transparent;
-      border-radius: 15px;
-      color: #fff;
-      font-family: 'Rajdhani', sans-serif;
-      font-size: 1rem;
-      transition: all 0.3s ease;
-      outline: none;
-    }
-
-    .form-input:focus, .form-textarea:focus {
-      border-color: var(--primary);
-      box-shadow: 
-        0 0 20px rgba(255, 0, 255, 0.3),
-        inset 0 0 20px rgba(255, 0, 255, 0.1);
-    }
-
-    .form-textarea {
-      min-height: 150px;
-      resize: vertical;
-    }
-
-    /* Commands Grid */
-    .commands-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-      gap: 10px;
-      margin-bottom: 20px;
-    }
-
-    .command-checkbox {
-      display: none;
-    }
-
-    .command-label {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 12px 15px;
-      background: rgba(0, 0, 0, 0.4);
-      border: 2px solid rgba(255, 255, 255, 0.1);
-      border-radius: 12px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      font-weight: 600;
-      color: rgba(255, 255, 255, 0.7);
-    }
-
-    .command-checkbox:checked + .command-label {
-      background: linear-gradient(135deg, var(--primary), var(--secondary));
-      border-color: var(--primary);
-      color: #fff;
-      box-shadow: 0 0 20px rgba(255, 0, 255, 0.5);
-      transform: scale(1.05);
-    }
-
-    .command-label:hover {
-      border-color: var(--primary);
-      transform: translateY(-2px);
-    }
-
-    /* Buttons */
-    .btn {
-      padding: 15px 40px;
-      border: none;
-      border-radius: 50px;
-      font-family: 'Orbitron', sans-serif;
-      font-size: 1rem;
-      font-weight: 700;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      text-transform: uppercase;
-      letter-spacing: 2px;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .btn-primary {
-      background: linear-gradient(135deg, var(--primary), var(--secondary));
-      color: #fff;
-      width: 100%;
-      margin-top: 20px;
-      box-shadow: 0 10px 30px rgba(255, 0, 255, 0.3);
-    }
-
-    .btn-primary:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 15px 40px rgba(255, 0, 255, 0.5);
-    }
-
-    .btn-primary:disabled {
-      background: rgba(255, 255, 255, 0.1);
-      color: rgba(255, 255, 255, 0.3);
-      cursor: not-allowed;
-      transform: none;
-      box-shadow: none;
-    }
-
-    .btn::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-      transition: left 0.5s ease;
-    }
-
-    .btn:hover::before {
-      left: 100%;
-    }
-
-    /* Checkbox */
-    .checkbox-container {
-      display: flex;
-      align-items: center;
-      margin-top: 20px;
-      cursor: pointer;
-    }
-
-    .checkbox-container input {
-      display: none;
-    }
-
-    .checkmark {
-      width: 25px;
-      height: 25px;
-      border: 2px solid var(--secondary);
-      border-radius: 5px;
-      margin-right: 15px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.3s ease;
-    }
-
-    .checkbox-container input:checked + .checkmark {
-      background: var(--primary);
-      border-color: var(--primary);
-      box-shadow: 0 0 15px var(--primary);
-    }
-
-    .checkmark::after {
-      content: '✓';
-      color: #fff;
-      font-weight: bold;
-      opacity: 0;
-      transition: opacity 0.3s ease;
-    }
-
-    .checkbox-container input:checked + .checkmark::after {
-      opacity: 1;
-    }
-
-    .checkbox-text {
-      color: rgba(255, 255, 255, 0.7);
-      font-size: 0.9rem;
-    }
-
-    /* Result */
-    #result {
-      margin-top: 20px;
-      padding: 15px;
-      border-radius: 15px;
-      text-align: center;
-      display: none;
-    }
-
-    #result.success {
-      display: block;
-      background: rgba(0, 255, 0, 0.2);
-      border: 1px solid #00ff00;
-      color: #00ff00;
-    }
-
-    #result.error {
-      display: block;
-      background: rgba(255, 0, 0, 0.2);
-      border: 1px solid #ff0000;
-      color: #ff0000;
-    }
-
-    /* Loading */
-    .loading {
-      display: inline-block;
-      width: 20px;
-      height: 20px;
-      border: 3px solid rgba(255,255,255,.3);
-      border-radius: 50%;
-      border-top-color: #fff;
-      animation: spin 1s ease-in-out infinite;
-      margin-right: 10px;
-    }
-
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-
-    /* Footer */
-    .footer {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      padding: 15px;
-      text-align: center;
-      color: rgba(255, 255, 255, 0.5);
-      font-size: 0.85rem;
-      background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
-    }
-
-    /* Navbar */
+    /* Navbar full dark/light adaptation */
     .navbar {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      padding: 15px 30px;
+      background-color: #ffffff !important;
+      border-bottom: 1px solid #dee2e6 !important;
+      padding: 0.75rem 1rem;
+    }
+    body.dark-mode .navbar {
+      background-color: #1a1a1a !important;
+      border-bottom: 1px solid #333 !important;
+    }
+
+    .navbar-brand,
+    .nav-link {
+      color: #212529 !important;
+    }
+    body.dark-mode .navbar-brand,
+    body.dark-mode .nav-link {
+      color: #e0e0e0 !important;
+    }
+    body.dark-mode .nav-link:hover,
+    body.dark-mode .nav-link:focus {
+      color: #ffffff !important;
+    }
+
+    /* Hamburger sa dark mode */
+    body.dark-mode .navbar-toggler-icon {
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255, 255, 255, 0.9%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") !important;
+    }
+
+    /* Theme toggle button (ilipat sa loob ng navbar) */
+    .theme-toggle {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: #f8f9fa;
+      border: 1px solid #dee2e6;
       display: flex;
-      justify-content: space-between;
       align-items: center;
-      background: rgba(0, 0, 0, 0.5);
-      backdrop-filter: blur(10px);
+      justify-content: center;
+      cursor: pointer;
+      font-size: 1.2rem;
+      transition: all 0.3s;
+      margin-left: 12px;
+    }
+
+    body.dark-mode .theme-toggle {
+      background: #2a2a2a;
+      border-color: #444;
+      color: #ffd700;
+    }
+
+    .theme-toggle:hover {
+      transform: scale(1.1);
+    }
+
+    /* Privacy popup */
+    .privacy-popup-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.55);
+      backdrop-filter: blur(5px);
+      z-index: 2000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.35s;
+    }
+    .privacy-popup-overlay.show {
+      opacity: 1;
+      visibility: visible;
+    }
+    .privacy-popup-card {
+      background: white;
+      max-width: 520px;
+      width: 92%;
+      border-radius: 24px;
+      padding: 32px 24px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+      text-align: center;
+    }
+    body.dark-mode .privacy-popup-card {
+      background: #222;
+      color: #eee;
+    }
+
+    /* Form elements */
+    .centered-textarea {
+      width: 100%;
+      min-height: 160px;
+      padding: 16px;
+      border: 1px solid #ced4da;
+      border-radius: 16px;
+      resize: vertical;
+      background: inherit;
+      color: inherit;
+    }
+    .center-placeholder::placeholder { text-align: center; color: #aaa; }
+
+    .form-check {
+      display: flex;
+      align-items: center;
+      padding: 14px 20px;
+      margin: 10px 0;
+      border: 1px solid #ccc;
+      border-radius: 60px;
+      cursor: pointer;
+      background: #fff;
+    }
+    body.dark-mode .form-check { background: #2a2a2a; }
+
+    .disable { opacity: 0.4; text-decoration: line-through; }
+
+    #inputOfPrefix, #inputOfAdmin {
+      padding: 12px 20px;
+      width: 100%;
+      max-width: 360px;
+      border: 1px solid #ccc;
+      border-radius: 50px;
+      background: inherit;
+      color: inherit;
+    }
+
+    .footer {
+      background: rgba(255,255,255,0.9);
+      backdrop-filter: blur(8px);
+      padding: 12px;
+      text-align: center;
+      font-size: 15px;
+      color: #555;
+      border-top: 1px solid #dee2e6;
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
       z-index: 100;
     }
-
-    .nav-logo {
-      font-family: 'Orbitron', sans-serif;
-      font-size: 1.2rem;
-      font-weight: 700;
-      background: linear-gradient(90deg, var(--primary), var(--secondary));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-
-    .nav-links {
-      display: flex;
-      gap: 20px;
-    }
-
-    .nav-link {
-      color: rgba(255, 255, 255, 0.7);
-      text-decoration: none;
-      font-weight: 600;
-      transition: all 0.3s ease;
-    }
-
-    .nav-link:hover {
-      color: var(--primary);
-      text-shadow: 0 0 10px var(--primary);
-    }
-
-    /* Mobile Responsive */
-    @media (max-width: 768px) {
-      .title {
-        font-size: 1.8rem;
-      }
-
-      .main-card {
-        padding: 25px;
-        margin: 10px;
-      }
-
-      .commands-grid {
-        grid-template-columns: repeat(2, 1fr);
-      }
-
-      .orb {
-        width: 200px;
-        height: 200px;
-      }
-
-      .navbar {
-        padding: 10px 15px;
-      }
-
-      .nav-links {
-        gap: 10px;
-      }
-
-      .nav-link {
-        font-size: 0.85rem;
-      }
-    }
-
-    @media (max-width: 480px) {
-      .title {
-        font-size: 1.5rem;
-      }
-
-      .subtitle {
-        font-size: 0.85rem;
-      }
-
-      .form-input, .form-textarea {
-        padding: 12px 15px;
-        font-size: 0.9rem;
-      }
-
-      .command-label {
-        padding: 10px;
-        font-size: 0.85rem;
-      }
-
-      .btn {
-        padding: 12px 30px;
-        font-size: 0.9rem;
-      }
+    body.dark-mode .footer {
+      background: rgba(30,30,30,0.92);
+      color: #bbb;
+      border-top: 1px solid #333;
     }
   </style>
 </head>
 <body>
-  <!-- Animated Background -->
-  <div class="bg-animation">
-    <div class="orb orb-1"></div>
-    <div class="orb orb-2"></div>
-    <div class="orb orb-3"></div>
+
+  <!-- Privacy Popup -->
+  <div class="privacy-popup-overlay" id="privacyPopup">
+    <div class="privacy-popup-card">
+      <i class="fas fa-shield-alt"></i>
+      <h2>Privacy & Terms</h2>
+      <p>We value your transparency — please review before continuing</p>
+      <div class="privacy-terms">
+        <strong>🔐 Appstate security:</strong> Never share it. It gives full access to the account.<br><br>
+        <strong>📌 Data:</strong> Nothing is stored on our servers. Processing is local / in-memory only.<br><br>
+        <strong>⚠️ Important:</strong><br>
+        • Use secondary / dummy accounts only<br>
+        • No malicious / spam usage allowed<br>
+        • Logging into the account may disconnect the bot<br>
+        • We are not responsible for account bans / suspensions<br>
+        • Service provided AS IS — no guarantees
+      </div>
+      <label style="display:flex; align-items:center; justify-content:center; gap:12px; margin:24px 0;">
+        <input type="checkbox" id="popupAgree"> I have read and agree to the terms
+      </label>
+      <button class="btn btn-primary" id="closePopupBtn" disabled>ACCEPT & CONTINUE</button>
+    </div>
   </div>
 
-  <!-- Navbar -->
-  <nav class="navbar">
-    <div class="nav-logo">VINCENTSENSEI</div>
-    <div class="nav-links">
-      <a href="/" class="nav-link">Home</a>
-      <a href="/active" class="nav-link">Active</a>
-      <a href="/guide" class="nav-link">Guide</a>
+  <!-- Navbar with theme toggle inside -->
+  <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <a class="navbar-brand" href="#">
+      <i class="fas fa-robot me-2"></i> VINCENTSENSEI
+    </a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+      <ul class="navbar-nav">
+        <li class="nav-item active">
+          <a class="nav-link" href="#"><i class="fas fa-home"></i> Home</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#"><i class="fas fa-users"></i> Active</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#"><i class="fas fa-book"></i> Guide</a>
+        </li>
+        <!-- Theme toggle button moved here (sa dulo ng navbar) -->
+        <li class="nav-item">
+          <div class="theme-toggle" id="themeToggle" title="Toggle dark/light mode">
+            <i class="fas fa-sun" id="themeIcon"></i>
+          </div>
+        </li>
+      </ul>
     </div>
   </nav>
 
   <div class="container">
-    <div class="main-card">
-      <h1 class="title">VINCENTSENSEI</h1>
-      <p class="subtitle">Advanced Facebook Messenger Bot</p>
+    <h1 class="text-center" style="font-size: 22px; padding: 12px;">
+      <i class="fas fa-robot"></i> VINCENTSENSEI Facebook Bot
+    </h1>
 
-      <div class="form-group">
-        <label class="form-label">Appstate JSON</label>
-        <textarea id="json-data" class="form-textarea" placeholder='Paste your Facebook appstate JSON here...'></textarea>
-      </div>
+    <textarea id="json-data" class="centered-textarea center-placeholder" placeholder='Paste your Facebook appstate JSON here...'></textarea>
 
-      <div class="form-group">
-        <label class="form-label">Commands</label>
-        <div class="commands-grid" id="commandsContainer">
-          <!-- Commands will be loaded dynamically -->
-          <div class="loading">Loading commands...</div>
-        </div>
-      </div>
+    <p class="mt-3 text-center text-muted">
+      <i class="fas fa-info-circle"></i> Paste your appstate JSON to start. Review terms below.
+    </p>
+  </div>
 
-      <div class="form-group">
-        <label class="form-label">Prefix</label>
-        <input type="text" id="inputOfPrefix" class="form-input" placeholder="/" value="/">
-      </div>
+  <div class="container">
+    <h1 class="text-center" style="font-size: 18px; padding: 10px;">
+      <i class="fas fa-file-contract"></i> Terms and Important Notes
+    </h1>
+    <p><i class="fas fa-link"></i> The bot stays connected unless you log in to the account or change the password.</p>
+    <p><i class="fas fa-shield"></i> Never share your appstate/JSON with anyone.</p>
+    <p><i class="fas fa-user-lock"></i> We are not responsible for unauthorized access.</p>
+    <p><i class="fas fa-power-off"></i> Logging into the account may stop the bot.</p>
+    <p><i class="fas fa-exclamation-triangle"></i> If the bot stops responding, revisit this page.</p>
+    <p><i class="fas fa-ban"></i> We are not liable for account suspension or locking.</p>
+    <p><i class="fas fa-user-secret"></i> Use dummy/secondary accounts for safety.</p>
+    <p><i class="fas fa-gavel"></i> No malicious or spam usage is allowed.</p>
 
-      <div class="form-group">
-        <label class="form-label">Admin UID (Optional)</label>
-        <input type="text" id="inputOfAdmin" class="form-input" placeholder="Admin Facebook UID">
-      </div>
+    <div class="section-card" id="listOfCommands">
+      <h1 style="font-size: 16px; padding: 10px;"><i class="fas fa-list"></i> Choose Commands</h1>
+      <button class="btn btn-primary mb-3" onclick="selectAllCommands()">
+        <i class="fas fa-check-double"></i> Select All Commands
+      </button>
+    </div>
 
-      <label class="checkbox-container">
-        <input type="checkbox" id="agreeCheckbox">
-        <span class="checkmark"></span>
-        <span class="checkbox-text">I agree to the Terms and Conditions</span>
+    <div class="section-card" id="listOfCommandsEvent">
+      <h1 style="font-size: 16px; padding: 10px;"><i class="fas fa-calendar-alt"></i> Choose Event Handlers</h1>
+      <button class="btn btn-primary mb-3" onclick="selectAllEvents()">
+        <i class="fas fa-check-double"></i> Select All Events
+      </button>
+    </div>
+
+    <div class="section-card">
+      <h1 style="font-size: 16px; padding: 10px;"><i class="fas fa-hashtag"></i> Prefix (optional)</h1>
+      <input type="text" id="inputOfPrefix" placeholder="e.g. / or ! (default: /)" value="/">
+    </div>
+
+    <div class="section-card">
+      <h1 style="font-size: 16px; padding: 10px;"><i class="fas fa-id-badge"></i> Admin UID (optional)</h1>
+      <input type="text" id="inputOfAdmin" placeholder="Your Facebook UID">
+    </div>
+
+    <div style="padding: 20px; text-align: center;">
+      <label style="font-size: 14px; display: flex; align-items: center; justify-content: center; gap: 10px;">
+        <input type="checkbox" id="agreeCheckbox"> 
+        <i class="far fa-check-circle mr-2"></i> 
+        I have read, understood, and agree to the Terms and Conditions.
       </label>
 
-      <button class="btn btn-primary" onclick="State()" id="submitButton" disabled>Login Bot</button>
-
-      <div id="result"></div>
+      <button class="btn btn-primary btn-lg mt-4" id="submitButton" disabled onclick="State()" style="width: 100%; max-width: 400px;">
+        <i class="fas fa-paper-plane"></i> Launch Bot
+      </button>
     </div>
   </div>
 
+  <div id="result" class="container text-center" style="display: none;"></div>
+
   <div class="footer">
-    <span id="time"></span> | <span id="ping"></span> | VINCENTSENSEI © 2024
+    <p><i class="fas fa-clock"></i> Time: <span id="time"></span></p>
+    <p><i class="fas fa-signal"></i> Ping: <span id="ping"></span> ms</p>
   </div>
 
-  <script src="script.js"></script>
-  <script>
-    document.getElementById('agreeCheckbox').addEventListener('change', function() {
-      document.getElementById('submitButton').disabled = !this.checked;
+<script>
+// Theme toggle (ngayon nasa loob na ng navbar)
+const themeToggle = document.getElementById('themeToggle');
+const themeIcon = document.getElementById('themeIcon');
+const body = document.body;
+
+function setTheme(isDark) {
+  body.classList.toggle('dark-mode', isDark);
+  themeIcon.className = isDark ? 'fas fa-moon' : 'fas fa-sun';
+}
+
+const saved = localStorage.getItem('theme');
+if (saved) {
+  setTheme(saved === 'dark');
+} else {
+  setTheme(window.matchMedia('(prefers-color-scheme: dark)').matches);
+}
+
+themeToggle.onclick = () => {
+  const isDark = body.classList.contains('dark-mode');
+  setTheme(!isDark);
+  localStorage.setItem('theme', !isDark ? 'dark' : 'light');
+};
+
+// Privacy popup
+const popup = document.getElementById('privacyPopup');
+const popupCheck = document.getElementById('popupAgree');
+const popupBtn = document.getElementById('closePopupBtn');
+
+window.addEventListener('load', () => popup.classList.add('show'));
+
+popupCheck.onchange = () => popupBtn.disabled = !popupCheck.checked;
+
+popupBtn.onclick = () => {
+  if (popupCheck.checked) popup.classList.remove('show');
+};
+
+// ──────────────────────────────────────────────
+// Lahat ng natitirang logic mo (hindi binago)
+// ──────────────────────────────────────────────
+
+let Commands = [{commands:[]}, {handleEvent:[]}];
+
+document.getElementById('agreeCheckbox').addEventListener('change', e => {
+  document.getElementById('submitButton').disabled = !e.target.checked;
+});
+
+function showAds() {
+  const ads = ['https://bit.ly/43yn66n','https://bit.ly/4adDagg','https://bit.ly/3VzhG92','https://bit.ly/3xkQTDg','https://bit.ly/3TTUAZC'];
+  window.location.href = ads[Math.floor(Math.random()*ads.length)];
+}
+
+function measurePing() {
+  const start = Date.now();
+  fetch(location.href + '?t=' + Date.now(), {cache:'no-store'})
+    .then(() => document.getElementById('ping').textContent = (Date.now()-start)+' ms')
+    .catch(()=>{});
+}
+setInterval(measurePing, 1400); measurePing();
+
+function updateTime() {
+  const now = new Date().toLocaleString('en-US', {
+    timeZone: 'Asia/Manila',
+    hour12: true,
+    hour:'numeric', minute:'numeric', second:'numeric'
+  });
+  document.getElementById('time').textContent = now;
+}
+setInterval(updateTime, 1000); updateTime();
+
+async function State() {
+  const json = document.getElementById('json-data');
+  const btn = document.getElementById('submitButton');
+
+  if (!Commands[0].commands.length) {
+    return showResult('Please select at least one command.', 'danger');
+  }
+
+  try {
+    btn.style.display = 'none';
+    const state = JSON.parse(json.value.trim());
+
+    const res = await fetch('/login', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        state,
+        commands: Commands,
+        prefix: document.getElementById('inputOfPrefix').value.trim() || '/',
+        admin: document.getElementById('inputOfAdmin').value.trim() || ''
+      })
     });
 
-    let Commands = [{ 'commands': [] }, { 'handleEvent': [] }];
+    const data = await res.json();
+    json.value = '';
+    showResult(data.message || 'Done.', 'success');
+    showAds();
+  } catch (e) {
+    json.value = '';
+    showResult('Invalid JSON or connection error.', 'danger');
+    showAds();
+  } finally {
+    setTimeout(() => btn.style.display = 'block', 4500);
+  }
+}
 
-    function updateTime() {
-      const now = new Date();
-      const options = {
-        timeZone: 'Asia/Manila',
-        hour12: true,
-        hour: 'numeric',
-        minute: 'numeric',
-        second: 'numeric'
-      };
-      const formattedTime = now.toLocaleString('en-US', options);
-      document.getElementById('time').textContent = formattedTime;
-    }
-    updateTime();
-    setInterval(updateTime, 1000);
+function showResult(msg, type = 'info') {
+  const el = document.getElementById('result');
+  el.innerHTML = `<h5 class="text-\( {type}"> \){msg}</h5>`;
+  el.style.display = 'block';
+}
 
-    function measurePing() {
-      var xhr = new XMLHttpRequest();
-      var startTime, endTime;
-      xhr.onreadystatechange = function() {
-        if (xhr.readyState === 4) {
-          endTime = Date.now();
-          var pingTime = endTime - startTime;
-          document.getElementById("ping").textContent = pingTime + " ms";
-        }
-      };
-      xhr.open("GET", location.href + "?t=" + new Date().getTime());
-      startTime = Date.now();
-      xhr.send();
+async function commandList() {
+  try {
+    const res = await fetch('/commands');
+    const { commands, handleEvent, aliases = [] } = await res.json();
+
+    const c = document.getElementById('listOfCommands');
+    const e = document.getElementById('listOfCommandsEvent');
+
+    commands.forEach((cmd,i) => c.appendChild(create(cmd,i+1,cmd,'commands',aliases[i]||[])));
+    handleEvent.forEach((ev,i) => e.appendChild(create(e,i+1,ev,'handleEvent',[])));
+  } catch(err){console.error(err);}
+}
+
+function create(parent, order, name, type, aliases) {
+  const d = document.createElement('div');
+  d.className = 'form-check form-switch';
+  d.onclick = toggle;
+
+  const inp = document.createElement('input');
+  inp.type = 'checkbox';
+  inp.className = `form-check-input ${type}`;
+  inp.checked = true;
+  inp.id = `sw_\( {type}_ \){order}`;
+
+  const lbl = document.createElement('label');
+  lbl.className = `form-check-label ${type}`;
+  lbl.htmlFor = inp.id;
+  lbl.textContent = `${order}. ${name}`;
+
+  d.append(inp, lbl);
+  return d;
+}
+
+function toggle() {
+  const g = [
+    {s:'.form-check-input.commands', a:Commands[0].commands, c:'commands'},
+    {s:'.form-check-input.handleEvent', a:Commands[1].handleEvent, c:'handleEvent'}
+  ];
+  g.forEach(gr => {
+    const cb = this.querySelector(gr.s);
+    const lb = this.querySelector(`.form-check-label.${gr.c}`);
+    if (!cb || !lb) return;
+    cb.checked = !cb.checked;
+    const n = lb.textContent.replace(/^\d+\.\s*/,'').split(' ')[0];
+    if (cb.checked) {
+      lb.classList.add('disable');
+      if (!gr.a.includes(n)) gr.a.push(n);
+    } else {
+      lb.classList.remove('disable');
+      const i = gr.a.indexOf(n);
+      if (i>-1) gr.a.splice(i,1);
     }
-    setInterval(measurePing, 1000);
-  </script>
+  });
+}
+
+function selectAllCommands() { toggleAll('.form-check-input.commands', Commands[0].commands); }
+function selectAllEvents()   { toggleAll('.form-check-input.handleEvent', Commands[1].handleEvent); }
+
+function toggleAll(sel, arr) {
+  const els = document.querySelectorAll(sel);
+  const allOn = [...els].every(e=>e.checked);
+  els.forEach(cb => {
+    const lb = cb.nextElementSibling;
+    const n = lb.textContent.replace(/^\d+\.\s*/,'').split(' ')[0];
+    cb.checked = !allOn;
+    if (cb.checked) {
+      lb.classList.add('disable');
+      if (!arr.includes(n)) arr.push(n);
+    } else {
+      lb.classList.remove('disable');
+      const i = arr.indexOf(n);
+      if (i>-1) arr.splice(i,1);
+    }
+  });
+}
+
+commandList();
+</script>
+
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>
