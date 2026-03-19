@@ -1,484 +1,355 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-bs-theme="light">
 <head>
-  <title>Active Accounts - VINCENTSENSEI</title>
   <meta charset="UTF-8">
+  <title>Active Users</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Bootstrap 5.3 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  
+  <!-- Font Awesome 6 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <!-- Poppins font -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap">
+
   <style>
     :root {
-      --primary: #ff00ff;
-      --secondary: #00ffff;
-      --tertiary: #ffff00;
-      --quaternary: #ff0000;
-      --bg-dark: #0a0a0f;
-      --glass: rgba(255, 255, 255, 0.05);
-      --glass-border: rgba(255, 255, 255, 0.1);
+      --body-bg:       #f9fafb;
+      --card-bg:       #ffffff;
+      --card-border:   #e5e7eb;
+      --text-main:     #111827;
+      --text-muted:    #6b7280;
+      --primary:       #3b82f6;
+      --shadow-sm:     0 4px 6px -1px rgba(0,0,0,0.06), 0 2px 4px -1px rgba(0,0,0,0.04);
+      --shadow-md:     0 10px 15px -3px rgba(0,0,0,0.08), 0 4px 6px -2px rgba(0,0,0,0.05);
     }
-    
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
+
+    [data-bs-theme="dark"] {
+      --body-bg:       #0f172a;
+      --card-bg:       #1e293b;
+      --card-border:   #334155;
+      --text-main:     #f1f5f9;
+      --text-muted:    #94a3b8;
+      --primary:       #60a5fa;
     }
-    
+
     body {
-      font-family: 'Rajdhani', sans-serif;
-      background: var(--bg-dark);
+      background: var(--body-bg);
+      color: var(--text-main);
+      font-family: 'Poppins', system-ui, sans-serif;
       min-height: 100vh;
-      overflow-x: hidden;
-      perspective: 1000px;
+      padding: 2rem 1rem 6rem;
+      transition: background 0.4s, color 0.4s;
     }
-    
-    /* Animated Background */
-    .bg-animation {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: -1;
+
+    .navbar {
+      box-shadow: var(--shadow-sm);
+    }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.3s ease;
       overflow: hidden;
     }
-    
-    .bg-animation::before {
-      content: '';
-      position: absolute;
-      top: -50%;
-      left: -50%;
-      width: 200%;
-      height: 200%;
-      background: 
-        radial-gradient(ellipse at 20% 20%, rgba(0, 255, 255, 0.3) 0%, transparent 50%),
-        radial-gradient(ellipse at 80% 20%, rgba(255, 0, 255, 0.3) 0%, transparent 50%),
-        radial-gradient(ellipse at 20% 80%, rgba(255, 255, 0, 0.2) 0%, transparent 50%),
-        radial-gradient(ellipse at 80% 80%, rgba(0, 255, 0, 0.2) 0%, transparent 50%);
-      animation: bgPulse 15s ease-in-out infinite;
+
+    .card:hover {
+      box-shadow: var(--shadow-md);
+      transform: translateY(-3px);
     }
-    
-    @keyframes bgPulse {
-      0%, 100% { transform: translate(0, 0) rotate(0deg); }
-      25% { transform: translate(5%, 5%) rotate(5deg); }
-      50% { transform: translate(0, 10%) rotate(0deg); }
-      75% { transform: translate(-5%, 5%) rotate(-5deg); }
+
+    .user-card {
+      padding: 1.25rem;
     }
-    
-    /* Floating Orbs */
-    .orb {
-      position: absolute;
-      border-radius: 50%;
-      filter: blur(60px);
-      animation: float 20s infinite ease-in-out;
-      opacity: 0.5;
-    }
-    
-    .orb-1 {
-      width: 400px;
-      height: 400px;
-      background: linear-gradient(45deg, var(--secondary), var(--primary));
-      top: 10%;
-      left: 10%;
-      animation-delay: 0s;
-    }
-    
-    .orb-2 {
-      width: 300px;
-      height: 300px;
-      background: linear-gradient(45deg, var(--tertiary), var(--quaternary));
-      top: 60%;
-      right: 10%;
-      animation-delay: -5s;
-    }
-    
-    @keyframes float {
-      0%, 100% { transform: translate(0, 0) scale(1); }
-      25% { transform: translate(30px, -30px) scale(1.1); }
-      50% { transform: translate(-20px, 20px) scale(0.9); }
-      75% { transform: translate(20px, 30px) scale(1.05); }
-    }
-    
-    /* Main Container */
-    .container {
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-start;
-      padding: 100px 20px 20px;
-      position: relative;
-    }
-    
-    /* Title */
-    .title {
-      font-family: 'Orbitron', sans-serif;
-      font-size: 2.5rem;
-      font-weight: 800;
-      text-align: center;
-      margin-bottom: 40px;
-      background: linear-gradient(90deg, var(--secondary), var(--primary), var(--tertiary), var(--secondary));
-      background-size: 300% 100%;
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      animation: rainbow 5s linear infinite;
-      text-shadow: 0 0 30px rgba(0, 255, 255, 0.5);
-      letter-spacing: 3px;
-    }
-    
-    @keyframes rainbow {
-      0% { background-position: 0% 50%; }
-      100% { background-position: 300% 50%; }
-    }
-    
-    /* Account Cards */
-    .accounts-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-      gap: 25px;
-      width: 100%;
-      max-width: 1200px;
-    }
-    
-    .account-card {
-      background: var(--glass);
-      backdrop-filter: blur(20px);
-      border: 1px solid var(--glass-border);
-      border-radius: 25px;
-      padding: 25px;
-      display: flex;
-      align-items: center;
-      gap: 20px;
-      transform-style: preserve-3d;
-      transition: all 0.4s ease;
-      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
-    }
-    
-    .account-card:hover {
-      transform: translateY(-10px) rotateX(5deg);
-      box-shadow: 
-        0 25px 50px rgba(0, 0, 0, 0.4),
-        0 0 30px rgba(0, 255, 255, 0.2);
-      border-color: var(--secondary);
-    }
-    
-    .account-avatar {
-      width: 80px;
-      height: 80px;
-      border-radius: 50%;
+
+    .avatar {
+      width: 68px;
+      height: 68px;
       object-fit: cover;
+      border-radius: 50%;
       border: 3px solid var(--primary);
-      box-shadow: 0 0 20px var(--primary);
+      box-shadow: 0 4px 12px rgba(59,130,246,0.2);
+    }
+
+    .online-dot {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      width: 14px;
+      height: 14px;
+      background: #22c55e;
+      border: 2px solid var(--card-bg);
+      border-radius: 50%;
+      box-shadow: 0 0 0 3px rgba(34,197,94,0.3);
       animation: pulse 2s infinite;
     }
-    
+
     @keyframes pulse {
-      0%, 100% { box-shadow: 0 0 20px var(--primary); }
-      50% { box-shadow: 0 0 40px var(--primary), 0 0 60px var(--secondary); }
-    }
-    
-    .account-info {
-      flex: 1;
-    }
-    
-    .account-info h3 {
-      font-family: 'Orbitron', sans-serif;
-      font-size: 1.2rem;
-      color: #fff;
-      margin-bottom: 8px;
-    }
-    
-    .account-info p {
-      color: rgba(255, 255, 255, 0.6);
-      font-size: 0.9rem;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    
-    .online-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      background: linear-gradient(135deg, #00ff00, #00ffff);
-      color: #000;
-      padding: 8px 16px;
-      border-radius: 20px;
-      font-weight: 700;
-      font-size: 0.85rem;
-      animation: glow 2s infinite;
-    }
-    
-    @keyframes glow {
-      0%, 100% { box-shadow: 0 0 10px #00ff00; }
-      50% { box-shadow: 0 0 25px #00ff00, 0 0 35px #00ffff; }
-    }
-    
-    .online-badge::before {
-      content: '';
-      width: 8px;
-      height: 8px;
-      background: #000;
-      border-radius: 50%;
-      animation: blink 1s infinite;
-    }
-    
-    @keyframes blink {
       0%, 100% { opacity: 1; }
-      50% { opacity: 0.3; }
+      50% { opacity: 0.4; }
     }
-    
-    /* Empty State */
-    .empty-state {
-      text-align: center;
-      padding: 60px 20px;
-      color: rgba(255, 255, 255, 0.5);
-    }
-    
-    .empty-state i {
-      font-size: 5rem;
-      margin-bottom: 20px;
-      background: linear-gradient(135deg, var(--primary), var(--secondary));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-    
-    .empty-state h2 {
-      font-family: 'Orbitron', sans-serif;
-      font-size: 1.5rem;
-      margin-bottom: 10px;
-    }
-    
-    /* Loading */
-    .loading {
-      text-align: center;
-      padding: 60px 20px;
-    }
-    
-    .loading i {
-      font-size: 3rem;
-      color: var(--secondary);
-      animation: spin 1s linear infinite;
-    }
-    
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-    
-    /* Navbar */
-    .navbar {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      padding: 15px 30px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background: rgba(0, 0, 0, 0.5);
-      backdrop-filter: blur(10px);
-      z-index: 100;
-    }
-    
-    .nav-logo {
-      font-family: 'Orbitron', sans-serif;
-      font-size: 1.2rem;
-      font-weight: 700;
-      background: linear-gradient(90deg, var(--primary), var(--secondary));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-    
-    .nav-links {
-      display: flex;
-      gap: 20px;
-    }
-    
-    .nav-link {
-      color: rgba(255, 255, 255, 0.7);
-      text-decoration: none;
+
+    .user-info h5 {
       font-weight: 600;
-      transition: all 0.3s ease;
+      margin-bottom: 0.35rem;
+      font-size: 1.15rem;
+      letter-spacing: -0.01em;
     }
-    
-    .nav-link:hover {
-      color: var(--secondary);
-      text-shadow: 0 0 10px var(--secondary);
+
+    .uptime {
+      font-size: 0.92rem;
+      color: var(--text-muted);
     }
-    
-    .nav-link.active {
-      color: var(--primary);
+
+    .section-title {
+      font-size: 1.4rem;
+      font-weight: 600;
+      margin-bottom: 1.25rem;
     }
-    
-    /* Footer */
+
     .footer {
+      background: rgba(255,255,255,0.7);
+      backdrop-filter: blur(10px);
+      border-top: 1px solid var(--card-border);
       position: fixed;
       bottom: 0;
       left: 0;
       right: 0;
-      padding: 15px;
+      padding: 1rem;
       text-align: center;
-      color: rgba(255, 255, 255, 0.5);
-      font-size: 0.85rem;
-      background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+      font-size: 0.95rem;
+      color: var(--text-muted);
     }
-    
-    /* Mobile Responsive */
-    @media (max-width: 768px) {
-      .title {
-        font-size: 1.8rem;
-      }
-      
-      .accounts-grid {
-        grid-template-columns: 1fr;
-      }
-      
-      .account-card {
-        padding: 20px;
-      }
-      
-      .account-avatar {
-        width: 60px;
-        height: 60px;
-      }
-      
-      .navbar {
-        padding: 10px 15px;
-      }
-      
-      .nav-links {
-        gap: 10px;
-      }
-      
-      .nav-link {
-        font-size: 0.85rem;
-      }
+
+    [data-bs-theme="dark"] .footer {
+      background: rgba(15,23,42,0.75);
     }
-    
-    @media (max-width: 480px) {
-      .title {
-        font-size: 1.5rem;
-      }
-      
-      .account-info h3 {
-        font-size: 1rem;
-      }
+
+    #theme-toggle {
+      font-size: 1.5rem;
+      cursor: pointer;
+      transition: transform 0.3s;
+    }
+
+    #theme-toggle:hover {
+      transform: rotate(30deg) scale(1.15);
     }
   </style>
 </head>
 <body>
-  <!-- Animated Background -->
-  <div class="bg-animation">
-    <div class="orb orb-1"></div>
-    <div class="orb orb-2"></div>
-  </div>
-  
-  <!-- Navbar -->
-  <nav class="navbar">
-    <div class="nav-logo">VINCENTSENSEI</div>
-    <div class="nav-links">
-      <a href="/" class="nav-link">Home</a>
-      <a href="/active" class="nav-link active">Active</a>
-      <a href="/guide" class="nav-link">Guide</a>
+
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg bg-body-tertiary">
+  <div class="container-fluid px-4">
+    <a class="navbar-brand fw-bold fs-4" href="#">Active Users</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+      <ul class="navbar-nav align-items-center">
+        <li class="nav-item"><a class="nav-link active px-3" href="#">Active</a></li>
+        <li class="nav-item"><a class="nav-link px-3" href="/">Home</a></li>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle px-3" href="#" role="button" data-bs-toggle="dropdown">Features</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="#">Cookies Extractor</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="#">Step-by-Step Guide</a></li>
+          </ul>
+        </li>
+        <li class="nav-item">
+          <span id="theme-toggle" class="nav-link px-3 fs-4" title="Toggle theme">
+            <i class="fa-solid fa-sun"></i>
+          </span>
+        </li>
+      </ul>
     </div>
-  </nav>
-  
-  <div class="container">
-    <h1 class="title">Active Bot Accounts</h1>
-    <div id="accounts-container">
-      <div class="loading">
-        <i class="fas fa-spinner fa-spin"></i>
-        <p>Loading accounts...</p>
-      </div>
-    </div>
   </div>
-  
-  <div class="footer">
-    <span id="time"></span> | <span id="ping"></span> | VINCENTSENSEI © 2024
+</nav>
+
+<div class="container" style="max-width: 960px; margin: 2rem auto;">
+
+  <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+    <h1 class="section-title mb-0">
+      Current Online 
+      <span id="onlineCount" class="badge bg-primary rounded-pill px-3 py-1 fs-6">0</span>
+    </h1>
+    <button onclick="refreshUsers()" class="btn btn-outline-primary btn-sm">
+      <i class="fa-solid fa-rotate me-1"></i> Refresh
+    </button>
   </div>
-  
-  <script>
-    function updateTime() {
-      const now = new Date();
-      const options = {
-        timeZone: 'Asia/Manila',
-        hour12: true,
-        hour: 'numeric',
-        minute: 'numeric',
-        second: 'numeric'
-      };
-      const formattedTime = now.toLocaleString('en-US', options);
-      document.getElementById('time').textContent = formattedTime;
-    }
-    updateTime();
-    setInterval(updateTime, 1000);
+
+  <div class="row g-4" id="user_online"></div>
+
+</div>
+
+<!-- Footer -->
+<div class="footer">
+  <span>Manila Time: <span id="time"></span>  •  Ping: <span id="ping"></span> ms</span>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+// Theme toggle (same as home page)
+const themeToggle = document.getElementById('theme-toggle');
+const html = document.documentElement;
+
+function setTheme(theme) {
+  html.setAttribute('data-bs-theme', theme);
+  localStorage.setItem('theme', theme);
+  themeToggle.innerHTML = theme === 'dark' 
+    ? '<i class="fa-solid fa-moon"></i>' 
+    : '<i class="fa-solid fa-sun"></i>';
+}
+
+setTheme(localStorage.getItem('theme') || 
+  (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'));
+
+themeToggle.addEventListener('click', () => {
+  setTheme(html.getAttribute('data-bs-theme') === 'dark' ? 'light' : 'dark');
+});
+
+// Time & Ping
+function updateTime() {
+  document.getElementById('time').textContent = 
+    new Date().toLocaleTimeString('en-US', { timeZone: 'Asia/Manila' });
+}
+setInterval(updateTime, 1000); updateTime();
+
+function measurePing() {
+  const t = Date.now();
+  fetch(location.href + '?t=' + t, {method: 'HEAD', cache: 'no-store'})
+    .then(() => document.getElementById('ping').textContent = Date.now() - t)
+    .catch(() => document.getElementById('ping').textContent = '—');
+}
+setInterval(measurePing, 4000); measurePing();
+
+// ────────────────────────────────────────────────
+// Hide full name → "Jaymar Reyes" → "J**** R****"
+function hideName(fullName) {
+  if (!fullName || typeof fullName !== 'string') return 'User';
+
+  const parts = fullName.trim().split(/\s+/);
+  if (parts.length === 0) return 'User';
+
+  return parts.map(part => {
+    if (part.length <= 1) return part;
+    return part[0] + '*'.repeat(part.length - 1);
+  }).join(' ');
+}
+
+// ────────────────────────────────────────────────
+// Format uptime
+function timeFormat(seconds) {
+  const days    = Math.floor(seconds / (3600 * 24));
+  const hours   = Math.floor((seconds % (3600 * 24)) / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+  const secs    = seconds % 60;
+
+  let str = '';
+  if (days    > 0) str += `${days}d `;
+  if (hours   > 0) str += `${hours}h `;
+  if (minutes > 0) str += `${minutes}m `;
+  str += `${secs}s`;
+
+  return str.trim();
+}
+
+// ────────────────────────────────────────────────
+// Load users
+async function listOfAi() {
+  const container = document.getElementById("user_online");
+  const countEl = document.getElementById("onlineCount");
+
+  try {
+    const response = await fetch("/info");
+    if (!response.ok) throw new Error("Network response was not ok");
     
-    function measurePing() {
-      var xhr = new XMLHttpRequest();
-      var startTime, endTime;
-      xhr.onreadystatechange = function() {
-        if (xhr.readyState === 4) {
-          endTime = Date.now();
-          var pingTime = endTime - startTime;
-          document.getElementById("ping").textContent = pingTime + " ms";
-        }
-      };
-      xhr.open("GET", location.href + "?t=" + new Date().getTime());
-      startTime = Date.now();
-      xhr.send();
+    const data = await response.json();
+
+    container.innerHTML = '';
+    countEl.textContent = data.length || 0;
+
+    if (data.length === 0) {
+      container.innerHTML = `
+        <div class="col-12 text-center py-5 text-muted">
+          <i class="fa-solid fa-users-slash fa-3x mb-3 opacity-50"></i>
+          <p>No users currently online</p>
+        </div>`;
+      return;
     }
-    setInterval(measurePing, 1000);
-    
-    async function loadAccounts() {
-      try {
-        const response = await fetch('/info');
-        const accounts = await response.json();
-        const container = document.getElementById('accounts-container');
-        
-        if (accounts.length === 0) {
-          container.innerHTML = `
-            <div class="empty-state">
-              <i class="fas fa-robot"></i>
-              <h2>No Active Bots</h2>
-              <p>Add a bot through the login page to get started!</p>
-            </div>
-          `;
-          return;
-        }
-        
-        container.innerHTML = '<div class="accounts-grid">';
-        
-        accounts.forEach(account => {
-          const card = document.createElement('div');
-          card.className = 'account-card';
-          card.innerHTML = `
-            <img src="${account.thumbSrc || 'https://via.placeholder.com/80'}" alt="Avatar" class="account-avatar">
-            <div class="account-info">
-              <h3>${account.name || 'Unknown'}</h3>
-              <p><i class="fas fa-clock"></i> Online Time: ${account.time || 0} seconds</p>
-            </div>
-            <span class="online-badge">Online</span>
-          `;
-          container.appendChild(card);
-        });
-        
-        container.innerHTML += '</div>';
-      } catch (error) {
-        console.error('Error loading accounts:', error);
-        document.getElementById('accounts-container').innerHTML = `
-          <div class="empty-state">
-            <i class="fas fa-exclamation-triangle"></i>
-            <h2>Error Loading Accounts</h2>
-            <p>Please try again later.</p>
+
+    data.forEach(user => {
+      const { name, thumbSrc, time } = user;
+
+      const hiddenName = hideName(name);
+
+      const col = document.createElement('div');
+      col.className = 'col-12 col-md-6 col-lg-4';
+
+      const card = document.createElement('div');
+      card.className = 'card user-card h-100 position-relative';
+
+      card.innerHTML = `
+        <div class="d-flex align-items-center gap-3">
+          <div class="position-relative flex-shrink-0">
+            <img src="${thumbSrc || 'https://via.placeholder.com/68?text=?'}"
+                 alt=""
+                 class="avatar"
+                 onerror="this.src='https://via.placeholder.com/68?text=?'">
+            <div class="online-dot"></div>
           </div>
-        `;
-      }
-    }
-    
-    loadAccounts();
-    setInterval(loadAccounts, 5000);
-  </script>
+          <div class="flex-grow-1 user-info">
+            <h5>${hiddenName}</h5>
+            <p class="uptime mb-0 mt-1">
+              <i class="fa-solid fa-clock me-1 text-muted"></i>
+              Uptime: <span class="uptime-value">${timeFormat(time)}</span>
+            </p>
+          </div>
+        </div>
+      `;
+
+      col.appendChild(card);
+      container.appendChild(col);
+
+      // Live counter
+      let current = time;
+      setInterval(() => {
+        current++;
+        const el = card.querySelector('.uptime-value');
+        if (el) el.textContent = timeFormat(current);
+      }, 1000);
+    });
+
+  } catch (err) {
+    console.error(err);
+    container.innerHTML = `
+      <div class="col-12">
+        <div class="alert alert-danger text-center py-4">
+          <i class="fa-solid fa-triangle-exclamation fa-2x mb-3"></i><br>
+          Failed to load online users<br>
+          <small>${err.message}</small>
+        </div>
+      </div>`;
+  }
+}
+
+function refreshUsers() {
+  document.getElementById("user_online").innerHTML = `
+    <div class="col-12 text-center py-5">
+      <div class="spinner-border text-primary" role="status"></div>
+      <p class="mt-3 text-muted">Refreshing...</p>
+    </div>`;
+  listOfAi();
+}
+
+// Start
+listOfAi();
+</script>
 </body>
 </html>
