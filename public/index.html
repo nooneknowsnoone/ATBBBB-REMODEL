@@ -1,334 +1,579 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <title>VINCENTSENSEI - Facebook Bot</title>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>GPT-4 · dark/light · privacy popup</title>
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    * { transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease; }
+    :root {
+      --primary: #ff00ff;
+      --secondary: #00ffff;
+      --tertiary: #ffff00;
+      --quaternary: #ff0000;
+      --bg-dark: #0a0a0f;
+      --glass: rgba(255, 255, 255, 0.05);
+      --glass-border: rgba(255, 255, 255, 0.1);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
     body {
-      padding: 20px;
-      font-family: 'Poppins', sans-serif;
-      background-color: #f8f9fa;
-      color: #212529;
-      margin-bottom: 100px;
-    }
-    body.dark-mode {
-      background-color: #121212;
-      color: #e0e0e0;
-    }
-    body.dark-mode .container {
-      background-color: #1e1e1e;
-      box-shadow: 0 0 15px rgba(0,0,0,0.5);
-      border-color: #333;
-    }
-    body.dark-mode .form-check {
-      background-color: #2a2a2a;
-      border-color: #444;
-    }
-    body.dark-mode .form-check:hover {
-      background-color: #333;
-      border-color: #777;
-    }
-    body.dark-mode .btn-primary {
-      background-color: #0b5ed7;
-      border-color: #0b5ed7;
-    }
-    body.dark-mode .btn-primary:hover {
-      background-color: #0a58ca;
-    }
-    body.dark-mode .footer {
-      background-color: rgba(30,30,30,0.9);
-      color: #bbb;
-      border-top: 1px solid #333;
-    }
-    body.dark-mode .navbar {
-      background-color: #1e1e1e !important;
-      border-bottom: 1px solid #333;
-    }
-    body.dark-mode .navbar-brand,
-    body.dark-mode .nav-link {
-      color: #e0e0e0 !important;
-    }
-    body.dark-mode .dropdown-menu {
-      background-color: #2a2a2a;
-      border-color: #444;
-    }
-    body.dark-mode .dropdown-item {
-      color: #ccc;
-    }
-    body.dark-mode .dropdown-item:hover {
-      background-color: #333;
+      font-family: 'Rajdhani', sans-serif;
+      background: var(--bg-dark);
+      min-height: 100vh;
+      overflow-x: hidden;
+      perspective: 1000px;
     }
 
-    .container {
-      background-color: #ffffff;
-      border-radius: 16px;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
-      padding: 24px;
-      margin-top: 20px;
-      margin-bottom: 20px;
-      border: 1px solid rgba(0,0,0,0.05);
-    }
-
-    h1 { font-weight: 600; letter-spacing: -0.3px; }
-    .centered-textarea {
-      display: block;
-      margin: 0 auto;
+    /* Animated Background */
+    .bg-animation {
+      position: fixed;
+      top: 0;
+      left: 0;
       width: 100%;
-      min-height: 150px;
-      padding: 16px;
-      border: 1px solid #ced4da;
-      border-radius: 16px;
-      resize: none;
-      background-color: inherit;
-      color: inherit;
-    }
-    .center-placeholder::placeholder {
-      text-align: center;
-      color: #aaa;
+      height: 100%;
+      z-index: -1;
+      overflow: hidden;
     }
 
-    .theme-toggle {
-      position: fixed;
-      top: 80px;
-      right: 20px;
-      z-index: 999;
-      background: white;
-      width: 48px;
-      height: 48px;
-      border-radius: 60px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-      cursor: pointer;
-      border: 1px solid #ddd;
-      transition: 0.2s;
-    }
-    body.dark-mode .theme-toggle {
-      background: #2a2a2a;
-      border-color: #555;
-      color: #ffdb70;
-    }
-    .theme-toggle i {
-      font-size: 1.8rem;
+    .bg-animation::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: 
+        radial-gradient(ellipse at 20% 20%, rgba(255, 0, 255, 0.3) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 20%, rgba(0, 255, 255, 0.3) 0%, transparent 50%),
+        radial-gradient(ellipse at 20% 80%, rgba(255, 255, 0, 0.2) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 80%, rgba(255, 0, 0, 0.2) 0%, transparent 50%);
+      animation: bgPulse 15s ease-in-out infinite;
     }
 
-    .privacy-popup-overlay {
-      position: fixed;
-      top: 0; left: 0; width: 100%; height: 100%;
-      background-color: rgba(0,0,0,0.5);
-      backdrop-filter: blur(4px);
-      z-index: 9999;
+    @keyframes bgPulse {
+      0%, 100% { transform: translate(0, 0) rotate(0deg); }
+      25% { transform: translate(5%, 5%) rotate(5deg); }
+      50% { transform: translate(0, 10%) rotate(0deg); }
+      75% { transform: translate(-5%, 5%) rotate(-5deg); }
+    }
+
+    /* Floating Orbs */
+    .orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(60px);
+      animation: float 20s infinite ease-in-out;
+      opacity: 0.5;
+    }
+
+    .orb-1 {
+      width: 400px;
+      height: 400px;
+      background: linear-gradient(45deg, var(--primary), var(--secondary));
+      top: 10%;
+      left: 10%;
+      animation-delay: 0s;
+    }
+
+    .orb-2 {
+      width: 300px;
+      height: 300px;
+      background: linear-gradient(45deg, var(--tertiary), var(--primary));
+      top: 60%;
+      right: 10%;
+      animation-delay: -5s;
+    }
+
+    .orb-3 {
+      width: 250px;
+      height: 250px;
+      background: linear-gradient(45deg, var(--secondary), var(--quaternary));
+      bottom: 20%;
+      left: 30%;
+      animation-delay: -10s;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      25% { transform: translate(30px, -30px) scale(1.1); }
+      50% { transform: translate(-20px, 20px) scale(0.9); }
+      75% { transform: translate(20px, 30px) scale(1.05); }
+    }
+
+    /* Main Container */
+    .container {
+      min-height: 100vh;
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
-      visibility: hidden;
-      opacity: 0;
-      transition: 0.2s;
-    }
-    .privacy-popup-card {
-      background: white;
-      max-width: 550px;
-      width: 90%;
-      border-radius: 32px;
-      padding: 30px;
-      box-shadow: 0 30px 60px rgba(0,0,0,0.3);
-      text-align: center;
+      padding: 20px;
       position: relative;
     }
-    body.dark-mode .privacy-popup-card {
-      background: #262626;
-      color: #eee;
-      border: 1px solid #444;
+
+    /* 3D Card */
+    .main-card {
+      background: var(--glass);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--glass-border);
+      border-radius: 30px;
+      padding: 40px;
+      width: 100%;
+      max-width: 600px;
+      transform-style: preserve-3d;
+      transform: rotateX(5deg);
+      box-shadow: 
+        0 25px 50px rgba(0, 0, 0, 0.5),
+        0 0 100px rgba(255, 0, 255, 0.2),
+        inset 0 0 50px rgba(255, 255, 255, 0.05);
+      animation: cardFloat 6s ease-in-out infinite;
     }
-    .privacy-popup-card i {
-      font-size: 3.5rem;
-      color: #0d6efd;
-      margin-bottom: 15px;
+
+    @keyframes cardFloat {
+      0%, 100% { transform: rotateX(5deg) translateY(0); }
+      50% { transform: rotateX(5deg) translateY(-10px); }
     }
-    .privacy-popup-card h2 {
-      font-weight: 600;
-      font-size: 1.8rem;
+
+    .main-card:hover {
+      transform: rotateX(0deg) scale(1.02);
+      box-shadow: 
+        0 30px 60px rgba(0, 0, 0, 0.5),
+        0 0 150px rgba(0, 255, 255, 0.3),
+        inset 0 0 50px rgba(255, 255, 255, 0.05);
     }
-    .privacy-popup-card .popup-terms {
-      max-height: 280px;
-      overflow-y: auto;
-      text-align: left;
-      background: #f8f9fa;
-      padding: 16px;
-      border-radius: 16px;
-      margin: 20px 0;
-      font-size: 0.9rem;
-      border: 1px solid #e9ecef;
-    }
-    body.dark-mode .privacy-popup-card .popup-terms {
-      background: #1e1e1e;
-      border-color: #333;
-    }
-    .btn-popup {
-      background: #0d6efd;
-      border: none;
-      color: white;
-      padding: 12px 32px;
-      border-radius: 40px;
-      font-weight: 600;
-      letter-spacing: 0.3px;
-    }
-    .footer {
-      background: rgba(255,255,255,0.8);
-      backdrop-filter: blur(8px);
-      padding: 12px;
+
+    /* Title */
+    .title {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 2.5rem;
+      font-weight: 800;
       text-align: center;
-      font-size: 15px;
-      color: #555;
-      border-top: 1px solid #dee2e6;
+      margin-bottom: 10px;
+      background: linear-gradient(90deg, var(--primary), var(--secondary), var(--tertiary), var(--primary));
+      background-size: 300% 100%;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: rainbow 5s linear infinite;
+      text-shadow: 0 0 30px rgba(255, 0, 255, 0.5);
+      letter-spacing: 3px;
+    }
+
+    @keyframes rainbow {
+      0% { background-position: 0% 50%; }
+      100% { background-position: 300% 50%; }
+    }
+
+    .subtitle {
+      text-align: center;
+      color: rgba(255, 255, 255, 0.6);
+      font-size: 1rem;
+      margin-bottom: 30px;
+      letter-spacing: 2px;
+    }
+
+    /* Form Elements */
+    .form-group {
+      margin-bottom: 20px;
+      transform: translateZ(20px);
+    }
+
+    .form-label {
+      display: block;
+      color: var(--secondary);
+      font-size: 0.9rem;
+      margin-bottom: 8px;
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .form-input, .form-textarea {
+      width: 100%;
+      padding: 15px 20px;
+      background: rgba(0, 0, 0, 0.4);
+      border: 2px solid transparent;
+      border-radius: 15px;
+      color: #fff;
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+      outline: none;
+    }
+
+    .form-input:focus, .form-textarea:focus {
+      border-color: var(--primary);
+      box-shadow: 
+        0 0 20px rgba(255, 0, 255, 0.3),
+        inset 0 0 20px rgba(255, 0, 255, 0.1);
+    }
+
+    .form-textarea {
+      min-height: 150px;
+      resize: vertical;
+    }
+
+    /* Commands Grid */
+    .commands-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .command-checkbox {
+      display: none;
+    }
+
+    .command-label {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px 15px;
+      background: rgba(0, 0, 0, 0.4);
+      border: 2px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-weight: 600;
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    .command-checkbox:checked + .command-label {
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      border-color: var(--primary);
+      color: #fff;
+      box-shadow: 0 0 20px rgba(255, 0, 255, 0.5);
+      transform: scale(1.05);
+    }
+
+    .command-label:hover {
+      border-color: var(--primary);
+      transform: translateY(-2px);
+    }
+
+    /* Buttons */
+    .btn {
+      padding: 15px 40px;
+      border: none;
+      border-radius: 50px;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: #fff;
+      width: 100%;
+      margin-top: 20px;
+      box-shadow: 0 10px 30px rgba(255, 0, 255, 0.3);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 15px 40px rgba(255, 0, 255, 0.5);
+    }
+
+    .btn-primary:disabled {
+      background: rgba(255, 255, 255, 0.1);
+      color: rgba(255, 255, 255, 0.3);
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+      transition: left 0.5s ease;
+    }
+
+    .btn:hover::before {
+      left: 100%;
+    }
+
+    /* Checkbox */
+    .checkbox-container {
+      display: flex;
+      align-items: center;
+      margin-top: 20px;
+      cursor: pointer;
+    }
+
+    .checkbox-container input {
+      display: none;
+    }
+
+    .checkmark {
+      width: 25px;
+      height: 25px;
+      border: 2px solid var(--secondary);
+      border-radius: 5px;
+      margin-right: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+    }
+
+    .checkbox-container input:checked + .checkmark {
+      background: var(--primary);
+      border-color: var(--primary);
+      box-shadow: 0 0 15px var(--primary);
+    }
+
+    .checkmark::after {
+      content: '✓';
+      color: #fff;
+      font-weight: bold;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .checkbox-container input:checked + .checkmark::after {
+      opacity: 1;
+    }
+
+    .checkbox-text {
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 0.9rem;
+    }
+
+    /* Result */
+    #result {
+      margin-top: 20px;
+      padding: 15px;
+      border-radius: 15px;
+      text-align: center;
+      display: none;
+    }
+
+    #result.success {
+      display: block;
+      background: rgba(0, 255, 0, 0.2);
+      border: 1px solid #00ff00;
+      color: #00ff00;
+    }
+
+    #result.error {
+      display: block;
+      background: rgba(255, 0, 0, 0.2);
+      border: 1px solid #ff0000;
+      color: #ff0000;
+    }
+
+    /* Loading */
+    .loading {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(255,255,255,.3);
+      border-radius: 50%;
+      border-top-color: #fff;
+      animation: spin 1s ease-in-out infinite;
+      margin-right: 10px;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Footer */
+    .footer {
       position: fixed;
       bottom: 0;
       left: 0;
-      width: 100%;
+      right: 0;
+      padding: 15px;
+      text-align: center;
+      color: rgba(255, 255, 255, 0.5);
+      font-size: 0.85rem;
+      background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+    }
+
+    /* Navbar */
+    .navbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      padding: 15px 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(10px);
       z-index: 100;
     }
-    .footer p { margin: 0 20px 0 0; display: inline-block; }
 
-    .form-check {
+    .nav-logo {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.2rem;
+      font-weight: 700;
+      background: linear-gradient(90deg, var(--primary), var(--secondary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .nav-links {
       display: flex;
-      margin-top: 10px;
-      padding: 14px;
-      align-items: center;
-      border: 1px solid #ccc;
-      border-radius: 60px;
-      cursor: pointer;
-      background-color: #fff;
+      gap: 20px;
     }
-    body.dark-mode .form-check { background-color: #2a2a2a; }
-    .form-check-input { margin-right: 14px; opacity: 0; width: 0; }
-    .disable { opacity: 0.4; text-decoration: line-through; }
-    #inputOfPrefix, #inputOfAdmin {
-      padding: 12px 20px;
-      width: 100%;
-      max-width: 300px;
-      border: 1px solid #ccc;
-      border-radius: 60px;
-      background-color: inherit;
-      color: inherit;
+
+    .nav-link {
+      color: rgba(255, 255, 255, 0.7);
+      text-decoration: none;
+      font-weight: 600;
+      transition: all 0.3s ease;
     }
-    #listOfCommands, #listOfCommandsEvent, #prefixOfCommands, #adminOfCommands {
-      border: none !important;
-      box-shadow: none;
-      background: transparent;
-      padding-left: 0;
-      padding-right: 0;
+
+    .nav-link:hover {
+      color: var(--primary);
+      text-shadow: 0 0 10px var(--primary);
+    }
+
+    /* Mobile Responsive */
+    @media (max-width: 768px) {
+      .title {
+        font-size: 1.8rem;
+      }
+
+      .main-card {
+        padding: 25px;
+        margin: 10px;
+      }
+
+      .commands-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .orb {
+        width: 200px;
+        height: 200px;
+      }
+
+      .navbar {
+        padding: 10px 15px;
+      }
+
+      .nav-links {
+        gap: 10px;
+      }
+
+      .nav-link {
+        font-size: 0.85rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .title {
+        font-size: 1.5rem;
+      }
+
+      .subtitle {
+        font-size: 0.85rem;
+      }
+
+      .form-input, .form-textarea {
+        padding: 12px 15px;
+        font-size: 0.9rem;
+      }
+
+      .command-label {
+        padding: 10px;
+        font-size: 0.85rem;
+      }
+
+      .btn {
+        padding: 12px 30px;
+        font-size: 0.9rem;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="theme-toggle" id="themeToggle" title="Toggle dark/light mode">
-    <i class="fas fa-sun" id="themeIcon"></i>
+  <!-- Animated Background -->
+  <div class="bg-animation">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
   </div>
 
-  <div class="privacy-popup-overlay" id="privacyPopup">
-    <div class="privacy-popup-card">
-      <i class="fas fa-shield-alt"></i>
-      <h2>Privacy & Terms</h2>
-      <p>We value your transparency — please review the summary</p>
-      <div class="popup-terms">
-        <strong>🔐 Cookie security:</strong> Never share your cookie. It grants access to your chatbot account.<br><br>
-        <strong>📋 Data retention:</strong> We do not store any cookie. All processing happens locally.<br><br>
-        <strong>⚖️ Terms highlights:</strong> Use dummy accounts, no malicious activities, service provided AS IS. By continuing you agree to the full terms below.
-      </div>
-      <label style="display:flex; align-items:center; justify-content:center; gap:10px; margin-bottom:20px;">
-        <input type="checkbox" id="popupAgreeCheckbox"> I have read and agree to the privacy policy & terms
-      </label>
-      <button class="btn btn-popup" id="closePopupBtn" disabled>ACCEPT & CONTINUE</button>
-    </div>
-  </div>
-
-  <nav class="navbar navbar-expand-lg navbar-light bg-light">
-    <a class="navbar-brand" href="#"><i class="fas fa-home me-2"></i> Home</a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse justify-content-end" id="navbarNav" style="margin-right: 70px;">
-      <ul class="navbar-nav">
-        <li class="nav-item active">
-          <a class="nav-link" href="/"><i class="fas fa-home"></i> Home <span class="sr-only">(current)</span></a>
-        </li>
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-cogs"></i> Features</a>
-          <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-            <a class="dropdown-item" href="#"><i class="fas fa-cookie-bite"></i> Cookies Extractor</a>
-            <div class="dropdown-divider"></div>
-            <a class="dropdown-item" href="/guide"><i class="fas fa-compass"></i> Step-by-Step Guide</a>
-          </div>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="online"><i class="fas fa-users"></i> Active</a>
-        </li>
-      </ul>
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="nav-logo">VINCENTSENSEI</div>
+    <div class="nav-links">
+      <a href="/" class="nav-link">Home</a>
+      <a href="/active" class="nav-link">Active</a>
+      <a href="/guide" class="nav-link">Guide</a>
     </div>
   </nav>
 
   <div class="container">
-    <h1 class="text-center" style="font-size: 20px; padding: 10px;"><i class="fas fa-robot"></i> Autobot</h1>
-    <form id="json-form" onsubmit="submitForm(event)">
-      <div class="row">
-        <div class="col-md-12">
-          <textarea id="json-data" class="form-control centered-textarea center-placeholder" placeholder='{ "paste your fbstate here..m" }'></textarea>
+    <div class="main-card">
+      <h1 class="title">VINCENTSENSEI</h1>
+      <p class="subtitle">Advanced Facebook Messenger Bot</p>
+
+      <div class="form-group">
+        <label class="form-label">Appstate JSON</label>
+        <textarea id="json-data" class="form-textarea" placeholder='Paste your Facebook appstate JSON here...'></textarea>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Commands</label>
+        <div class="commands-grid" id="commandsContainer">
+          <!-- Commands will be loaded dynamically -->
+          <div class="loading">Loading commands...</div>
         </div>
       </div>
-    </form>
-    <p class="mt-3"><i class="fas fa-info-circle"></i> Greetings! Begin by entering your cookie. Scroll down to carefully review our Terms and Privacy.</p>
-  </div>
 
-  <div class="container">
-    <h1 class="text-center" style="font-size: 20px; padding: 10px;"><i class="fas fa-file-contract"></i> Terms and Privacy</h1>
-    <p><i class="fas fa-link"></i> Upon deployment or logging in, your chatbot connection remains active unless you personally access the bot's account or modify the password.</p>
-    <p><i class="fas fa-shield"></i> Exercise caution and refrain from sharing your cookie with any third party.</p>
-    <p><i class="fas fa-user-lock"></i> As the service provider, we disclaim responsibility for any unauthorized account access.</p>
-    <p><i class="fas fa-power-off"></i> Accessing the bot's account may lead to a disruption in service.</p>
-    <p><i class="fas fa-exclamation-triangle"></i> If the chatbot is unresponsive, kindly return to this website.</p>
-    <p><i class="fas fa-ban"></i> We disclaim responsibility for any account locking or suspension.</p>
-    <p><i class="fas fa-user-secret"></i> For added security, it is highly recommended to use dummy accounts.</p>
-    <p><i class="fas fa-gavel"></i> Users are strictly prohibited from employing the chatbot for malicious activities.</p>
-    
-    <div class="container" id="listOfCommands">
-      <h1 style="font-size: 16px; padding: 10px;"><i class="fas fa-list"></i> Please choose your commands</h1>
-      <button class="btn btn-primary" onclick="selectAllCommands()"><i class="fas fa-check-double"></i> Select all commands</button>
-    </div>
-    <div class="container" id="listOfCommandsEvent">
-      <h1 style="font-size: 16px; padding: 10px;"><i class="fas fa-calendar-alt"></i> Please choose your event commands</h1>
-      <button class="btn btn-primary" onclick="selectAllEvents()"><i class="fas fa-check-double"></i> Select all events</button>
-    </div>
-    <div class="container" id="prefixOfCommands">
-      <h1 style="font-size: 16px; padding: 10px;"><i class="fas fa-hashtag"></i> Provide a prefix (optional, default "non-prefix")</h1>
-      <input type="text" id="inputOfPrefix" placeholder="e.g. ! or 'non-prefix'">
-    </div>
-    <div class="container" id="adminOfCommands">
-      <h1 style="font-size: 16px; padding: 10px;"><i class="fas fa-id-badge"></i> Provide an uid (optional, default 'default')</h1>
-      <input type="text" id="inputOfAdmin" placeholder="e.g. 1234567890">
-    </div>
+      <div class="form-group">
+        <label class="form-label">Prefix</label>
+        <input type="text" id="inputOfPrefix" class="form-input" placeholder="/" value="/">
+      </div>
 
-    <label style="font-size: 14px; display: flex; align-items: center; padding: 22px;">
-      <input type="checkbox" id="agreeCheckbox" style="margin-right: 10px;"> <i class="far fa-check-circle mr-2"></i> Checking this box certifies that I have read, understood, and agreed to the Terms and Conditions.
-    </label>
+      <div class="form-group">
+        <label class="form-label">Admin UID (Optional)</label>
+        <input type="text" id="inputOfAdmin" class="form-input" placeholder="Admin Facebook UID">
+      </div>
 
-    <div class="col text-center">
-      <button class="btn btn-primary" onclick="State()" disabled id="submitButton" style="width: 100%"><i class="fas fa-paper-plane"></i> Submit</button>
+      <label class="checkbox-container">
+        <input type="checkbox" id="agreeCheckbox">
+        <span class="checkmark"></span>
+        <span class="checkbox-text">I agree to the Terms and Conditions</span>
+      </label>
+
+      <button class="btn btn-primary" onclick="State()" id="submitButton" disabled>Login Bot</button>
+
+      <div id="result"></div>
     </div>
   </div>
-
-  <div id="result" class="container text-center" style="display: none;"></div>
 
   <div class="footer">
-    <p><i class="fas fa-clock"></i> Time: <span id="time"></span></p>
-    <p><i class="fas fa-signal"></i> Ping: <span id="ping"></span></p>
+    <span id="time"></span> | <span id="ping"></span> | VINCENTSENSEI © 2024
   </div>
 
+  <script src="script.js"></script>
   <script>
     document.getElementById('agreeCheckbox').addEventListener('change', function() {
       document.getElementById('submitButton').disabled = !this.checked;
@@ -336,11 +581,20 @@
 
     let Commands = [{ 'commands': [] }, { 'handleEvent': [] }];
 
-    function showAds() {
-      var ads = [ ', '', '', '' ];
-      var index = Math.floor(Math.random() * ads.length);
-      window.location.href = ads[index];
+    function updateTime() {
+      const now = new Date();
+      const options = {
+        timeZone: 'Asia/Manila',
+        hour12: true,
+        hour: 'numeric',
+        minute: 'numeric',
+        second: 'numeric'
+      };
+      const formattedTime = now.toLocaleString('en-US', options);
+      document.getElementById('time').textContent = formattedTime;
     }
+    updateTime();
+    setInterval(updateTime, 1000);
 
     function measurePing() {
       var xhr = new XMLHttpRequest();
@@ -357,211 +611,6 @@
       xhr.send();
     }
     setInterval(measurePing, 1000);
-
-    function updateTime() {
-      const now = new Date();
-      const options = { timeZone: 'Asia/Manila', hour12: true, hour: 'numeric', minute: 'numeric', second: 'numeric' };
-      const formattedTime = now.toLocaleString('en-US', options);
-      document.getElementById('time').textContent = formattedTime;
-    }
-    updateTime();
-    setInterval(updateTime, 1000);
-
-    async function State() {
-      const jsonInput = document.getElementById('json-data');
-      const button = document.getElementById('submitButton');
-      if (!Commands[0].commands.length) {
-        return showResult('Please provide at least one valid command for execution.');
-      }
-      try {
-        button.style.display = 'none';
-        const State = JSON.parse(jsonInput.value);
-        if (State && typeof State === 'object') {
-          const response = await fetch('/login', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ state: State, commands: Commands, prefix: document.getElementById('inputOfPrefix').value, admin: document.getElementById('inputOfAdmin').value }),
-          });
-          const data = await response.json();
-          jsonInput.value = '';
-          showResult(data.message);
-          showAds();
-        } else {
-          jsonInput.value = '';
-          showResult('Invalid JSON data. Please check your input.');
-          showAds();
-        }
-      } catch (parseError) {
-        jsonInput.value = '';
-        showResult('Error parsing JSON. Please check your input.');
-        showAds();
-      } finally {
-        setTimeout(() => { button.style.display = 'block'; }, 4000);
-      }
-    }
-
-    function showResult(message) {
-      const resultContainer = document.getElementById('result');
-      resultContainer.innerHTML = `<h5>${message}</h5>`;
-      resultContainer.style.display = 'block';
-    }
-
-    async function commandList() {
-      try {
-        const [listOfCommands, listOfCommandsEvent] = [document.getElementById('listOfCommands'), document.getElementById('listOfCommandsEvent')];
-        const response = await fetch('/commands');
-        const { commands, handleEvent, aliases } = await response.json();
-        [commands, handleEvent].forEach((commandArr, i) => {
-          commandArr.forEach((command, index) => {
-            const container = createCommand(i === 0 ? listOfCommands : listOfCommandsEvent, index + 1, command, i === 0 ? 'commands' : 'handleEvent', aliases[index] || []);
-            (i === 0 ? listOfCommands : listOfCommandsEvent).appendChild(container);
-          });
-        });
-      } catch (error) { console.log(error); }
-    }
-
-    function createCommand(element, order, command, type, aliases) {
-      const container = document.createElement('div');
-      container.classList.add('form-check', 'form-switch');
-      container.onclick = toggleCheckbox;
-      const checkbox = document.createElement('input');
-      checkbox.classList.add('form-check-input', type === 'handleEvent' ? 'handleEvent' : 'commands');
-      checkbox.type = 'checkbox';
-      checkbox.role = 'switch';
-      checkbox.id = `flexSwitchCheck_${order}`;
-      const label = document.createElement('label');
-      label.classList.add('form-check-label', type === 'handleEvent' ? 'handleEvent' : 'commands');
-      label.htmlFor = `flexSwitchCheck_${order}`;
-      label.textContent = `${order}. ${command}`;
-      container.appendChild(checkbox);
-      container.appendChild(label);
-      return container;
-    }
-
-    function toggleCheckbox() {
-      const box = [{ input: '.form-check-input.commands', label: '.form-check-label.commands', array: Commands[0].commands }, { input: '.form-check-input.handleEvent', label: '.form-check-label.handleEvent', array: Commands[1].handleEvent }];
-      box.forEach(({ input, label, array }) => {
-        const checkbox = this.querySelector(input);
-        const labelText = this.querySelector(label);
-        if (checkbox) {
-          checkbox.checked = !checkbox.checked;
-          if (checkbox.checked) {
-            labelText.classList.add('disable');
-            const command = labelText.textContent.replace(/^\d+\.\s/, '').split(" ")[0];
-            array.push(command);
-          } else {
-            labelText.classList.remove('disable');
-            const command = labelText.textContent.replace(/^\d+\.\s/, '').split(" ")[0];
-            const removeCommand = array.indexOf(command);
-            if (removeCommand !== -1) array.splice(removeCommand, 1);
-          }
-        }
-      });
-    }
-
-    function selectAllCommands() {
-      const box = [{ input: '.form-check-input.commands', array: Commands[0].commands }];
-      box.forEach(({ input, array }) => {
-        const checkboxes = document.querySelectorAll(input);
-        const allChecked = Array.from(checkboxes).every(checkbox => checkbox.checked);
-        checkboxes.forEach((checkbox) => {
-          if (allChecked) {
-            checkbox.checked = false;
-            const labelText = checkbox.nextElementSibling;
-            labelText.classList.remove('disable');
-            const command = labelText.textContent.replace(/^\d+\.\s/, '').split(" ")[0];
-            const removeCommand = array.indexOf(command);
-            if (removeCommand !== -1) array.splice(removeCommand, 1);
-          } else {
-            checkbox.checked = true;
-            const labelText = checkbox.nextElementSibling;
-            labelText.classList.add('disable');
-            const command = labelText.textContent.replace(/^\d+\.\s/, '').split(" ")[0];
-            if (!array.includes(command)) array.push(command);
-          }
-        });
-      });
-    }
-
-    function selectAllEvents() {
-      const box = [{ input: '.form-check-input.handleEvent', array: Commands[1].handleEvent }];
-      box.forEach(({ input, array }) => {
-        const checkboxes = document.querySelectorAll(input);
-        const allChecked = Array.from(checkboxes).every(checkbox => checkbox.checked);
-        checkboxes.forEach((checkbox) => {
-          if (allChecked) {
-            checkbox.checked = false;
-            const labelText = checkbox.nextElementSibling;
-            labelText.classList.remove('disable');
-            const event = labelText.textContent.replace(/^\d+\.\s/, '').split(" ")[0];
-            const removeEvent = array.indexOf(event);
-            if (removeEvent !== -1) array.splice(removeEvent, 1);
-          } else {
-            checkbox.checked = true;
-            const labelText = checkbox.nextElementSibling;
-            labelText.classList.add('disable');
-            const event = labelText.textContent.replace(/^\d+\.\s/, '').split(" ")[0];
-            if (!array.includes(event)) array.push(event);
-          }
-        });
-      });
-    }
-
-    commandList();
-
-    const themeToggle = document.getElementById('themeToggle');
-    const themeIcon = document.getElementById('themeIcon');
-    const body = document.body;
-
-    function setTheme(theme) {
-      if (theme === 'dark') {
-        body.classList.add('dark-mode');
-        themeIcon.className = 'fas fa-moon';
-      } else {
-        body.classList.remove('dark-mode');
-        themeIcon.className = 'fas fa-sun';
-      }
-    }
-    const storedTheme = localStorage.getItem('theme');
-    if (storedTheme) {
-      setTheme(storedTheme);
-    } else {
-      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      setTheme(prefersDark ? 'dark' : 'light');
-    }
-
-    themeToggle.addEventListener('click', () => {
-      if (body.classList.contains('dark-mode')) {
-        setTheme('light');
-        localStorage.setItem('theme', 'light');
-      } else {
-        setTheme('dark');
-        localStorage.setItem('theme', 'dark');
-      }
-    });
-
-    const popup = document.getElementById('privacyPopup');
-    const popupAgree = document.getElementById('popupAgreeCheckbox');
-    const closePopupBtn = document.getElementById('closePopupBtn');
-
-    window.addEventListener('load', function() {
-      popup.style.visibility = 'visible';
-      popup.style.opacity = '1';
-    });
-
-    popupAgree.addEventListener('change', function() {
-      closePopupBtn.disabled = !this.checked;
-    });
-
-    closePopupBtn.addEventListener('click', function() {
-      if (!popupAgree.checked) return;
-      popup.style.visibility = 'hidden';
-      popup.style.opacity = '0';
-    });
   </script>
-
-  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>
