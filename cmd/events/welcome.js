@@ -36,7 +36,7 @@ module.exports = {
       const memberCount = groupInfo.participantIDs.length;
 
       // Construct the API URL for the welcome image
-      const url = `https://kryptonite-api-library.onrender.com/api/welcome?username=${encodeURIComponent(name)}&avatarUrl=https://graph.facebook.com/${senderID}/picture?width=500&height=500&access_token=6628568379%7Cc1e620fa708a1d5696fb991c1bde5662&groupname=${encodeURIComponent(groupName)}&bg=${encodeURIComponent(background)}&memberCount=${memberCount}`;
+      const url = `https://kryptonite-api-library.onrender.com/api/welcome?username=${encodeURIComponent(name)}&avatarUrl=https://kryptonite-api-library.onrender.com/api/profile?uid={senderID}&groupname=${encodeURIComponent(groupName)}&bg=${encodeURIComponent(background)}&memberCount=${memberCount}`;
 
       // Try to fetch and send the welcome image
       const axios = require('axios');
