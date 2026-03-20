@@ -1,18 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <title>Active Session</title>
+  <title>Active Session - VINCENTSENSEI</title>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <!-- Bootstrap 4 + Poppins + Font Awesome 6 (for real icons) -->
+
+  <!-- Bootstrap 4 + Font Awesome 6 + Poppins -->
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
   <style>
-    /* GLOBAL TRANSITION (exactly as unified UI) */
+    /* ──────────────────────────────────────────────
+       GLOBAL TRANSITION + BASE (exactly matching your pasted style)
+    ────────────────────────────────────────────── */
     * { transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease; }
 
-    /* LIGHT MODE (original Active background) */
     body {
       padding: 20px;
       font-family: 'Poppins', sans-serif;
@@ -21,65 +24,81 @@
       margin-bottom: 20px;
     }
 
-    /* DARK MODE (same as unified UI) */
+    /* DARK MODE ───────────────────────────────────── */
     body.dark-mode {
       background-color: #121212;
       color: #e0e0e0;
     }
+
     body.dark-mode .container {
       background-color: #1e1e1e;
       box-shadow: 0 0 15px rgba(0,0,0,0.5);
       border-color: #333;
     }
+
     body.dark-mode .navbar {
       background-color: #1e1e1e !important;
       border-bottom: 1px solid #333;
     }
+
     body.dark-mode .navbar-brand,
     body.dark-mode .nav-link {
       color: #e0e0e0 !important;
     }
+
     body.dark-mode .navbar-light .navbar-toggler-icon {
       filter: invert(1);
     }
+
     body.dark-mode .dropdown-menu {
       background-color: #2a2a2a;
       border-color: #444;
     }
+
     body.dark-mode .dropdown-item {
       color: #ccc;
     }
+
     body.dark-mode .dropdown-item:hover {
       background-color: #333;
     }
+
     body.dark-mode .user-card {
       background-color: #262626;
       border-color: #444;
       animation: dark-glow 3s infinite alternate;
     }
+
     @keyframes dark-glow {
       from { border-color: #666; }
-      to { border-color: #aaa; }
+      to   { border-color: #aaa; }
     }
+
     body.dark-mode .img-thumbnail {
       background-color: #2e2e2e;
       border-color: #555;
     }
+
     body.dark-mode .user-info p {
       color: #aaa;
     }
+
     body.dark-mode .uptime-user {
       color: #6ea8fe;
     }
+
     body.dark-mode .btn-primary {
       background-color: #0b5ed7;
       border-color: #0b5ed7;
     }
+
     body.dark-mode .btn-primary:hover {
       background-color: #0a58ca;
     }
 
-    /* CONTAINER style from unified UI (rounded, shadow) */
+    /* ──────────────────────────────────────────────
+       CONTAINER (rounded + shadow from your example)
+    ────────────────────────────────────────────── */
     .container {
       background-color: #ffffff;
       border-radius: 20px;
@@ -90,7 +109,9 @@
       border: 1px solid rgba(0,0,0,0.05);
     }
 
-    /* THEME TOGGLE (exact same position & look) */
+    /* ──────────────────────────────────────────────
+       THEME TOGGLE (exact same style & position)
+    ────────────────────────────────────────────── */
     .theme-toggle {
       position: fixed;
       top: 80px;
@@ -108,20 +129,26 @@
       border: 1px solid #ddd;
       transition: 0.2s;
     }
+
     body.dark-mode .theme-toggle {
       background: #2a2a2a;
       border-color: #555;
       color: #ffdb70;
     }
+
     .theme-toggle i {
       font-size: 1.8rem;
     }
 
-    /* USER CARDS (exactly as in original Active, but integrated) */
+    /* ──────────────────────────────────────────────
+       USER CARDS (exact match from your Active page)
+    ────────────────────────────────────────────── */
     #user_online {
       display: flex;
       flex-wrap: wrap;
+      gap: 16px;
     }
+
     .user-card {
       display: flex;
       align-items: center;
@@ -135,60 +162,56 @@
       animation: glow 3s infinite alternate;
       background-color: #ffffff;
     }
+
     @keyframes glow {
       from { border-color: #000; }
-      to { border-color: #fff; }
+      to   { border-color: #fff; }
     }
-    body.dark-mode .user-card {
-      animation: dark-glow 3s infinite alternate;
-    }
+
     .user-card img {
       max-width: 60px;
       border-radius: 12px;
       margin-right: 16px;
     }
+
     .user-info {
       flex-grow: 1;
+      text-align: left;
     }
+
     .user-info h4 {
-      margin-left: 3px;
-      margin-bottom: 3px;
+      margin: 0 0 3px 3px;
       font-size: 16px;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      text-align: start;
       font-weight: 600;
     }
+
     .user-info p {
       margin: 0;
       font-size: 13px;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      text-align: start;
       color: #555;
     }
+
     p.uptime-user {
       font-size: 12px;
       color: #0d6efd;
       font-weight: 500;
     }
-
-    /* tiny adjustment for navbar brand icon (optional) */
-    .navbar-brand i {
-      margin-right: 6px;
-    }
   </style>
 </head>
 <body>
 
-  <!-- THEME TOGGLE (real icon sun/moon) exactly like unified UI -->
+  <!-- Theme Toggle Button -->
   <div class="theme-toggle" id="themeToggle" title="Toggle dark/light">
     <i class="fas fa-sun" id="themeIcon"></i>
   </div>
 
-  <!-- original navbar (exactly as provided, but with real icons inside) -->
+  <!-- Navbar -->
   <nav class="navbar navbar-expand-lg navbar-light bg-light">
     <a class="navbar-brand" href="#"><i class="fas fa-chart-line"></i> Active</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -203,7 +226,9 @@
           <a class="nav-link" href="/"><i class="fas fa-home"></i> Home</a>
         </li>
         <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-cogs"></i> Features</a>
+          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <i class="fas fa-cogs"></i> Features
+          </a>
           <div class="dropdown-menu" aria-labelledby="navbarDropdown">
             <a class="dropdown-item" href="#"><i class="fas fa-cookie-bite"></i> Cookies Extractor</a>
             <div class="dropdown-divider"></div>
@@ -214,94 +239,20 @@
     </div>
   </nav>
 
-  <!-- main container: Current Online (exactly as original Active) -->
+  <!-- Main Content -->
   <div class="container">
     <div class="row">
-      <h1 class="col text-start" style="margin-left: 12px; font-size: 20px;"><i class="fas fa-users"></i> Current Online:</h1>
+      <h1 class="col text-start" style="margin-left: 12px; font-size: 20px;">
+        <i class="fas fa-users"></i> Current Online:
+      </h1>
     </div>
     <div class="row" id="user_online"></div>
   </div>
 
-  <!-- original script (listOfAi and helpers) + dark mode logic -->
   <script>
-    // ---------- ORIGINAL Active FUNCTIONS (unchanged) ----------
-    async function listOfAi() {
-      const userOnline = document.getElementById("user_online");
-      try {
-        const response = await fetch("/info");
-        const data = await response.json();
-        userOnline.innerHTML = '';
-        data.forEach(user => {
-          const {
-            name,
-            thumbSrc,
-            profileUrl,
-            time,
-          } = user;
-          const userCard = document.createElement('div');
-          userCard.className = 'col-12 user-card mb-4';
-          const image = document.createElement('img');
-          image.src = thumbSrc;
-          image.alt = 'User Thumbnail';
-          image.className = 'img-thumbnail';
-          const userInfo = document.createElement('div');
-          userInfo.className = 'user-info';
-          const userName = document.createElement('h4');
-          userName.textContent = name;
-          const profileLink = document.createElement('p');
-          profileLink.innerHTML = `${profileUrl}`;
-          const uptimeUser = document.createElement('p');
-          uptimeUser.className = 'uptime-user';
-          uptimeUser.innerHTML = `Uptime: ${timeFormat(time)}`;
-          userInfo.appendChild(userName);
-          userInfo.appendChild(profileLink);
-          userInfo.appendChild(uptimeUser);
-          userCard.appendChild(image);
-          userCard.appendChild(userInfo);
-          userOnline.appendChild(userCard);
-
-          const intervalId = setInterval(() => {
-            user.time++;
-            updateTimer(userCard, user.time);
-          }, 1000);
-        });
-      } catch (error) {
-        console.error(error);
-        userOnline.innerHTML = `<div class="alert alert-danger" role="alert">An error occurred while fetching data.</div>`;
-      }
-    }
-
-    function updateTimer(userCard, currentTime) {
-      const uptimeUser = userCard.querySelector('.uptime-user');
-      uptimeUser.textContent = `Uptime: ${timeFormat(currentTime)}`;
-    }
-
-    function timeFormat(currentTime) {
-      const days = Math.floor(currentTime / (3600 * 24));
-      const hours = Math.floor((currentTime % (3600 * 24)) / 3600);
-      const minutes = Math.floor((currentTime % 3600) / 60);
-      const seconds = currentTime % 60;
-
-      let timeFormat = '';
-
-      switch (true) {
-        case days > 0:
-          timeFormat += `${days} day${days > 1 ? 's' : ''} `;
-        case hours > 0:
-          timeFormat += `${hours} hour${hours > 1 ? 's' : ''} `;
-        case minutes > 0:
-          timeFormat += `${minutes} minute${minutes > 1 ? 's' : ''} `;
-        default:
-          timeFormat += `${seconds} second${seconds > 1 ? 's' : ''}`;
-      }
-
-      return timeFormat.trim();
-    }
-
-    // start original function
-    listOfAi();
-
-    // ---------- DARK MODE with REAL ICON (exactly as unified UI) ----------
+    // ──────────────────────────────────────────────
+    //  Theme Toggle Logic (same as your unified UI)
+    // ──────────────────────────────────────────────
     const themeToggle = document.getElementById('themeToggle');
     const themeIcon = document.getElementById('themeIcon');
     const body = document.body;
@@ -309,14 +260,13 @@
     function setTheme(theme) {
       if (theme === 'dark') {
         body.classList.add('dark-mode');
-        themeIcon.className = 'fas fa-moon';   // real moon icon
+        themeIcon.className = 'fas fa-moon';
       } else {
         body.classList.remove('dark-mode');
-        themeIcon.className = 'fas fa-sun';    // real sun icon
+        themeIcon.className = 'fas fa-sun';
       }
     }
 
-    // load saved theme or system preference
     const storedTheme = localStorage.getItem('theme');
     if (storedTheme) {
       setTheme(storedTheme);
@@ -335,18 +285,86 @@
       }
     });
 
-    // optional: follow system changes if no manual override
-    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
-      if (!localStorage.getItem('theme')) {
-        setTheme(e.matches ? 'dark' : 'light');
+    // ──────────────────────────────────────────────
+    //  Original Active Session Logic (unchanged)
+    // ──────────────────────────────────────────────
+    async function listOfAi() {
+      const userOnline = document.getElementById("user_online");
+      try {
+        const response = await fetch("/info");
+        const data = await response.json();
+        userOnline.innerHTML = '';
+
+        data.forEach(user => {
+          const { name, thumbSrc, profileUrl, time } = user;
+
+          const userCard = document.createElement('div');
+          userCard.className = 'col-12 user-card mb-4';
+
+          const image = document.createElement('img');
+          image.src = thumbSrc;
+          image.alt = 'User Thumbnail';
+          image.className = 'img-thumbnail';
+
+          const userInfo = document.createElement('div');
+          userInfo.className = 'user-info';
+
+          const userName = document.createElement('h4');
+          userName.textContent = name;
+
+          const profileLink = document.createElement('p');
+          profileLink.innerHTML = profileUrl;
+
+          const uptimeUser = document.createElement('p');
+          uptimeUser.className = 'uptime-user';
+          uptimeUser.innerHTML = `Uptime: ${timeFormat(time)}`;
+
+          userInfo.appendChild(userName);
+          userInfo.appendChild(profileLink);
+          userInfo.appendChild(uptimeUser);
+
+          userCard.appendChild(image);
+          userCard.appendChild(userInfo);
+          userOnline.appendChild(userCard);
+
+          // Live uptime counter
+          const intervalId = setInterval(() => {
+            user.time++;
+            updateTimer(userCard, user.time);
+          }, 1000);
+        });
+      } catch (error) {
+        console.error(error);
+        userOnline.innerHTML = `<div class="alert alert-danger" role="alert">An error occurred while fetching data.</div>`;
       }
-    });
+    }
+
+    function updateTimer(userCard, currentTime) {
+      const uptimeUser = userCard.querySelector('.uptime-user');
+      uptimeUser.textContent = `Uptime: ${timeFormat(currentTime)}`;
+    }
+
+    function timeFormat(currentTime) {
+      const days    = Math.floor(currentTime / (3600 * 24));
+      const hours   = Math.floor((currentTime % (3600 * 24)) / 3600);
+      const minutes = Math.floor((currentTime % 3600) / 60);
+      const seconds = currentTime % 60;
+
+      let str = '';
+      if (days > 0)    str += `\( {days} day \){days > 1 ? 's' : ''} `;
+      if (hours > 0)   str += `\( {hours} hour \){hours > 1 ? 's' : ''} `;
+      if (minutes > 0) str += `\( {minutes} minute \){minutes > 1 ? 's' : ''} `;
+      str += `\( {seconds} second \){seconds > 1 ? 's' : ''}`;
+      return str.trim();
+    }
+
+    // Start loading active users
+    listOfAi();
   </script>
 
-  <!-- original script includes (unchanged) -->
+  <!-- Bootstrap JS -->
   <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
 </body>
 </html>
