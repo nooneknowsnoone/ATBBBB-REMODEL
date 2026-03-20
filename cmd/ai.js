@@ -56,7 +56,7 @@ async function fetchAIResponse(api, event, userInput, senderID, prefix) {
 
     if (response.data && response.data.answer) {
       const generatedText = response.data.answer;
-      const formattedResponse = `🤖 **AI Response**\n━━━━━━━━━━━━━━━━━━\n${generatedText}\n━━━━━━━━━━━━━━━━━━\n\n💡 **Model:** GPT-4\n📌 **Powered by:** Autobot Project`;
+      const formattedResponse = `🤖 **AI Response**\n━━━━━━━━━━━━━━━━━━\n${generatedText}\n━━━━━━━━━━━━━━━━━━`;
 
       api.sendMessage(formattedResponse, threadID, messageID);
     } else {
