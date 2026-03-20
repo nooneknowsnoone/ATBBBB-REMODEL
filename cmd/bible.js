@@ -1,44 +1,54 @@
 // bible.js
-module.exports = {
-  config: {
-    name: "bible",
-    aliases: [],
-    version: "1.0.0",
-    role: 0,
-    cooldown: 3,
-    hasPrefix: true,
-    credits: "Autobot Project",
-    description: "Fetch a random Bible verse",
-    usage: "{pn}"
-  },
+const axios = require("axios");
 
-  run: async function ({ api, event }) {
-    const { threadID, messageID } = event;
+const config = {
+  name: "bible",
+  aliases: ["verse", "bibleverse"],
+  version: "1.0.0",
+  role: 0,
+  cooldown: 5,
+  credits: "Autobot Project",
+  description: "Get a random Bible verse",
+  category: "random",
+  hasPrefix: true,
+  usage: "{pn}",
+  example: "{pn}"
+};
 
-    try {
-      await api.sendMessage("📖 Fetching a Bible verse...", threadID, messageID);
-
-      const response = await axios.get("https://beta.ourmanna.com/api/v1/get/?format=text");
-      const verse = response.data.trim();
-
-      if (!verse) {
-        return api.sendMessage("🥺 Sorry, I couldn't fetch a Bible verse right now.", threadID, messageID);
-      }
-
-      return api.sendMessage(
-        `📜 Bible Verse\n\n"${verse}"`,
-        threadID,
-        messageID
-      );
-
-    } catch (error) {
-      console.error("Bible command error:", error.message);
-      
-      return api.sendMessage(
-        `❌ Sorry, something went wrong.\n${error.message}`,
-        threadID,
-        messageID
-      );
+async function run({ api, event, args, prefix }) {
+  const { threadID, messageID } = event;
+  
+  // Show processing reaction
+  api.setMessageReaction("📖", messageID, () => {}, true);
+  
+  try {
+    const response = await axios.get("https://bible-api.com/?random=verse&translation=web", { timeout: 10000 });
+    const { text: verse, reference } = response.data;
+    
+    const message = `📖 **${reference}**\n━━━━━━━━━━━━━━━━━━\n${verse.trim()}\n━━━━━━━━━━━━━━━━━━\n\n— World English Bible\n💡 **Powered by:** Autobot Project`;
+    
+    await api.sendMessage(message, threadID, messageID);
+  } catch (error) {
+    console.error("[bible]", error.message);
+    
+    let errMsg = "❌ An error occurred while fetching a Bible verse. Please try again later.";
+    
+    if (error.code === "ECONNABORTED") {
+      errMsg = "❌ The Bible API took too long to respond. Please try again.";
+    } else if (error.response) {
+      errMsg = `❌ API error: ${error.response.status} - ${error.message}`;
     }
+    
+    api.sendMessage(errMsg, threadID, messageID);
+  } finally {
+    // Remove reaction after done
+    setTimeout(() => {
+      api.setMessageReaction("", messageID, () => {}, true);
+    }, 1000);
   }
+}
+
+module.exports = {
+  config,
+  run
 };
