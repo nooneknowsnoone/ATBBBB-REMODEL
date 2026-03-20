@@ -1,18 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <title>Step-By-Step Guide · dark/light mode</title>
+  <title>Step-By-Step Guide - VINCENTSENSEI</title>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <!-- Bootstrap 4 + Poppins + Font Awesome 6 (for real icons) -->
+
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
   <style>
-    /* ----- global transition (smooth like active page) ----- */
     * { transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease; }
 
-    /* ----- light mode (original style preserved) ----- */
     body {
       padding: 20px;
       font-family: 'Poppins', sans-serif;
@@ -21,7 +20,53 @@
       margin-bottom: 20px;
     }
 
-    /* containers exactly like active page (rounded, shadow) */
+    body.dark-mode {
+      background-color: #121212;
+      color: #e0e0e0;
+    }
+
+    body.dark-mode .container {
+      background-color: #1e1e1e;
+      box-shadow: 0 0 15px rgba(0,0,0,0.5);
+      border-color: #333;
+    }
+
+    body.dark-mode .navbar {
+      background-color: #1e1e1e !important;
+      border-bottom: 1px solid #333;
+    }
+
+    body.dark-mode .navbar-brand,
+    body.dark-mode .nav-link {
+      color: #e0e0e0 !important;
+    }
+
+    body.dark-mode .navbar-light .navbar-toggler-icon {
+      filter: invert(1);
+    }
+
+    body.dark-mode .dropdown-menu {
+      background-color: #2a2a2a;
+      border-color: #444;
+    }
+
+    body.dark-mode .dropdown-item {
+      color: #ccc;
+    }
+
+    body.dark-mode .dropdown-item:hover {
+      background-color: #333;
+    }
+
+    body.dark-mode img {
+      border-color: #444;
+      opacity: 0.92;
+    }
+
+    body.dark-mode a {
+      color: #6ea8fe;
+    }
+
     .container {
       background-color: #ffffff;
       border-radius: 20px;
@@ -32,192 +77,200 @@
       border: 1px solid rgba(0,0,0,0.05);
     }
 
-    /* headings */
-    h1 { font-weight: 600; letter-spacing: -0.3px; }
+    /* Theme toggle – now styled to look like your screenshot */
+    .theme-toggle {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: #2a2a2a;
+      border: 1px solid #444;
+      color: #ffdb70;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+      margin-top: 16px;
+      margin-left: auto;
+      margin-right: auto;
+    }
 
-    /* images – keep original sizing but add slight rounding */
+    body:not(.dark-mode) .theme-toggle {
+      background: white;
+      border: 1px solid #ddd;
+      color: #333;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    .theme-toggle i {
+      font-size: 1.6rem;
+    }
+
+    .theme-toggle:hover {
+      transform: scale(1.08);
+    }
+
+    /* Vertical nav links style to match screenshot */
+    .navbar-nav-vertical {
+      flex-direction: column;
+      align-items: flex-start;
+      padding-left: 15px;
+    }
+
+    .navbar-nav-vertical .nav-link {
+      padding: 8px 16px;
+      font-size: 1rem;
+      border-radius: 8px;
+      margin-bottom: 4px;
+      transition: all 0.2s;
+    }
+
+    .navbar-nav-vertical .nav-link:hover {
+      background: rgba(0,0,0,0.05);
+    }
+
+    body.dark-mode .navbar-nav-vertical .nav-link:hover {
+      background: rgba(255,255,255,0.08);
+    }
+
+    h1 {
+      font-weight: 600;
+      letter-spacing: -0.3px;
+      margin-bottom: 1.2rem;
+    }
+
+    p {
+      font-size: 1rem;
+      line-height: 1.6;
+      margin-bottom: 1.25rem;
+    }
+
     img {
       display: block;
-      margin: 10px auto;
+      margin: 16px auto;
       border-radius: 16px;
       max-width: 100%;
       height: auto;
       border: 1px solid #dee2e6;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
     }
 
-    /* paragraphs and links */
-    p { font-size: 1rem; line-height: 1.5; }
-    a { color: #0d6efd; }
-
-    /* ----- DARK MODE (exact same as active page) ----- */
-    body.dark-mode {
-      background-color: #121212;
-      color: #e0e0e0;
-    }
-    body.dark-mode .container {
-      background-color: #1e1e1e;
-      box-shadow: 0 0 15px rgba(0,0,0,0.5);
-      border-color: #333;
-    }
-    body.dark-mode .navbar {
-      background-color: #1e1e1e !important;
-      border-bottom: 1px solid #333;
-    }
-    body.dark-mode .navbar-brand,
-    body.dark-mode .nav-link {
-      color: #e0e0e0 !important;
-    }
-    body.dark-mode .navbar-light .navbar-toggler-icon {
-      filter: invert(1);
-    }
-    body.dark-mode .dropdown-menu {
-      background-color: #2a2a2a;
-      border-color: #444;
-    }
-    body.dark-mode .dropdown-item {
-      color: #ccc;
-    }
-    body.dark-mode .dropdown-item:hover {
-      background-color: #333;
-    }
     body.dark-mode img {
       border-color: #444;
-      opacity: 0.9;
     }
+
+    a {
+      color: #0d6efd;
+    }
+
     body.dark-mode a {
       color: #6ea8fe;
     }
-    body.dark-mode .btn-primary {
-      background-color: #0b5ed7;
-      border-color: #0b5ed7;
+
+    .note-section {
+      margin-top: 2.5rem;
+      padding: 1.5rem;
+      border-left: 4px solid #ffc107;
+      background-color: rgba(255,193,7,0.08);
+      border-radius: 8px;
     }
 
-    /* ----- THEME TOGGLE (real icon, same as active page) ----- */
-    .theme-toggle {
-      position: fixed;
-      top: 80px;
-      right: 20px;
-      z-index: 999;
-      background: white;
-      width: 48px;
-      height: 48px;
-      border-radius: 60px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-      cursor: pointer;
-      border: 1px solid #ddd;
-      transition: 0.2s;
-    }
-    body.dark-mode .theme-toggle {
-      background: #2a2a2a;
-      border-color: #555;
-      color: #ffdb70;
-    }
-    .theme-toggle i {
-      font-size: 1.8rem;
-    }
-
-    /* keep original navbar icon spacing */
-    .navbar-brand i, .nav-link i {
-      margin-right: 6px;
+    body.dark-mode .note-section {
+      border-left-color: #ffca2c;
+      background-color: rgba(255,202,44,0.12);
     }
   </style>
 </head>
 <body>
 
-  <!-- THEME TOGGLE (real icon sun/moon) exactly like active page -->
-  <div class="theme-toggle" id="themeToggle" title="Toggle dark/light">
-    <i class="fas fa-sun" id="themeIcon"></i>
-  </div>
-
-  <!-- NAVBAR (exactly as provided, but with real icons for consistency) -->
+  <!-- Navbar -->
   <nav class="navbar navbar-expand-lg navbar-light bg-light">
     <a class="navbar-brand" href="#"><i class="fas fa-compass"></i> Step-By-Step Guide</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
-    <div class="collapse navbar-collapse justify-content-end" id="navbarNav" style="margin-right: 70px;">
-      <ul class="navbar-nav">
+
+    <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+      <ul class="navbar-nav navbar-nav-vertical">
         <li class="nav-item active">
-          <a class="nav-link" href="#"><i class="fas fa-map-signs"></i> Step-By-Step Guide <span class="sr-only">(current)</span></a>
+          <a class="nav-link" href="#"><i class="fas fa-map-signs"></i> Guide</a>
         </li>
         <li class="nav-item">
           <a class="nav-link" href="/"><i class="fas fa-home"></i> Home</a>
         </li>
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-cogs"></i> Features</a>
-          <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-            <a class="dropdown-item" href="#"><i class="fas fa-cookie-bite"></i> Cookies Extractor</a>
-            <div class="dropdown-divider"></div>
-            <a class="dropdown-item" href="/guide"><i class="fas fa-compass"></i> Step-By-Step Guide</a>
-          </div>
-        </li>
         <li class="nav-item">
           <a class="nav-link" href="online"><i class="fas fa-users"></i> Active</a>
+        </li>
+        <!-- Dark/Light toggle – placed below Active like your screenshot -->
+        <li class="nav-item">
+          <div class="theme-toggle" id="themeToggle" title="Toggle dark/light mode">
+            <i class="fas fa-moon" id="themeIcon"></i>
+          </div>
         </li>
       </ul>
     </div>
   </nav>
 
-  <!-- MAIN CONTENT: STEP-BY-STEP GUIDE (exactly as provided) -->
+  <!-- Main Guide Content -->
   <div class="container">
-    <h1 class="text-center" style="font-size: 20px; padding: 10px;"><i class="fas fa-list-ol"></i> Step-By-Step Guide</h1>
+    <h1 class="text-center" style="font-size: 20px; padding: 10px;">
+      <i class="fas fa-list-ol"></i> Step-By-Step Guide
+    </h1>
 
     <p>1. Install the Kiwi Browser from the Google Play Store and proceed to launch the application.</p>
-    <img src="image/guide_1.jpeg" alt="" width="300" height="200">
+    <img src="image/guide_1.jpeg" alt="Step 1" width="300" height="200">
 
     <p>2. Upon launching the app, navigate to the search function and enter the following link: <a href="https://github.com/c3cbot/c3c-fbstate/archive/refs/tags/1.5.zip">https://github.com/c3cbot/c3c-fbstate/archive/refs/tags/1.5.zip</a></p>
-    <img src="image/guide_2.jpeg" alt="" width="300" height="200">
+    <img src="image/guide_2.jpeg" alt="Step 2" width="300" height="200">
 
     <p>3. Once entered, a prompt will appear instructing you to download the file; proceed by clicking the download option.</p>
-    <img src="image/guide_3.jpeg" alt="" width="300" height="200">
+    <img src="image/guide_3.jpeg" alt="Step 3" width="300" height="200">
 
     <p>4. After completing the download, tap the three dots in the upper-right corner, then select the "Extensions" option.</p>
-    <img src="image/guide_4.jpeg" alt="" width="300" height="200">
+    <img src="image/guide_4.jpeg" alt="Step 4" width="300" height="200">
 
     <p>5. In the Extensions menu, enable Developer Mode, then click the "+" button to add the extension from either a zip file, crx file, or user.js file.</p>
-    <img src="image/guide_5.jpeg" alt="" width="300" height="200">
+    <img src="image/guide_5.jpeg" alt="Step 5" width="300" height="200">
 
     <p>6. Locate the previously downloaded zip file and click on it to initiate the installation process.</p>
-    <img src="image/guide_6.jpeg" alt="" width="300" height="200">
+    <img src="image/guide_6.jpeg" alt="Step 6" width="300" height="200">
 
     <p>7. Once the installation is complete, observe the C3C fbstate utility in the bottom-right corner and activate it by clicking on it.</p>
-    <img src="image/guide_7.jpeg" alt="" width="300" height="200">
+    <img src="image/guide_7.jpeg" alt="Step 7" width="300" height="200">
 
     <p>8. Upon activation, navigate to Facebook.com using the Kiwi Browser and log in your account.</p>
-    <img src="image/guide_8.jpeg" alt="" width="300" height="200">
+    <img src="image/guide_8.jpeg" alt="Step 8" width="300" height="200">
 
     <p>9. After logging in, access the menu by clicking the three dots in the upper right corner, scroll down, and locate the C3C fbstate utility.</p>
-    <img src="image/guide_9.jpeg" alt="" width="300" height="200">
+    <img src="image/guide_9.jpeg" alt="Step 9" width="300" height="200">
 
     <p>10. You'll be redirected to another page; locate the "Copy Clipboard" option and click it to copy your cookies for further use.</p>
-    <img src="image/guide_10.jpeg" alt="" width="300" height="200">
+    <img src="image/guide_10.jpeg" alt="Step 10" width="300" height="200">
 
     <p>11. Paste your copied cookies at <a href="https://auto-bot-soyeon.onrender.com">https://auto-bot-soyeon.onrender.com</a>, then scroll down to thoroughly review the Terms and Conditions and Privacy Policy.</p>
-    <img src="image/guide_11.jpeg" alt="" width="300" height="200">
+    <img src="image/guide_11.jpeg" alt="Step 11" width="300" height="200">
 
     <p>12. Finally, having carefully reviewed the Terms and Conditions and Privacy Policy, check the box to confirm your understanding and submit the information.</p>
-    <img src="image/guide_12.jpeg" alt="" width="300" height="200">
+    <img src="image/guide_12.jpeg" alt="Step 12" width="300" height="200">
 
     <p>13. Certainly, please input "ai" to confirm the bot's operational status. If it responds, congratulations on successful verification.</p>
-    <img src="image/guide_13.jpeg" alt="" width="300" height="200">
+    <img src="image/guide_13.jpeg" alt="Step 13" width="300" height="200">
 
-    <br>
-    <h1 class="text-center" style="font-size: 20px;"><i class="fas fa-exclamation-triangle"></i> Note:</h1>
-    <p>• In case the bot encounters a login issue during the initial log, it may be due to a lock. Simply unlock it and repeat the process.</p>
-    <p>• If the bot is already logged into Facebook/FB Lite, refrain from logging in on other devices or initiating a logout.</p>
-    <p>• While the bot is active, avoid logging into the bot account or changing the password.</p>
-    <p>• Please be aware that there is a possibility of encountering account locks or suspensions, and we are not responsible for such occurrences.</p>
-    <p>• Please be aware that there is a possibility of encountering account locks or suspensions, and we are not responsible for such occurrences.</p>
-    <p>• To register another bot/Al, simply tap on "logout" (not die appstate) to acquire a new appstate for another account.</p>
-    <img src="image/guide_16.jpeg" alt="" width="300" height="200">
+    <div class="note-section">
+      <h1 class="text-center" style="font-size: 20px; margin-bottom: 1rem;">
+        <i class="fas fa-exclamation-triangle"></i> Important Notes
+      </h1>
+      <p>• In case the bot encounters a login issue during the initial log, it may be due to a lock. Simply unlock it and repeat the process.</p>
+      <p>• If the bot is already logged into Facebook/FB Lite, refrain from logging in on other devices or initiating a logout.</p>
+      <p>• While the bot is active, avoid logging into the bot account or changing the password.</p>
+      <p>• Please be aware that there is a possibility of encountering account locks or suspensions, and we are not responsible for such occurrences.</p>
+      <p>• To register another bot/AI, simply tap on "logout" (not die appstate) to acquire a new appstate for another account.</p>
+      <img src="image/guide_16.jpeg" alt="Note illustration" width="300" height="200">
+    </div>
   </div>
 
-  <!-- SCRIPTS: dark mode logic (exactly like active page) + original includes -->
   <script>
-    // ---------- DARK MODE with REAL ICON (same as active page) ----------
+    // Theme Toggle Logic
     const themeToggle = document.getElementById('themeToggle');
     const themeIcon = document.getElementById('themeIcon');
     const body = document.body;
@@ -225,14 +278,13 @@
     function setTheme(theme) {
       if (theme === 'dark') {
         body.classList.add('dark-mode');
-        themeIcon.className = 'fas fa-moon';   // real moon icon
+        themeIcon.className = 'fas fa-moon';
       } else {
         body.classList.remove('dark-mode');
-        themeIcon.className = 'fas fa-sun';    // real sun icon
+        themeIcon.className = 'fas fa-sun';
       }
     }
 
-    // load saved theme or system preference
     const storedTheme = localStorage.getItem('theme');
     if (storedTheme) {
       setTheme(storedTheme);
@@ -251,7 +303,6 @@
       }
     });
 
-    // optional: follow system changes if no manual override
     window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
       if (!localStorage.getItem('theme')) {
         setTheme(e.matches ? 'dark' : 'light');
@@ -259,10 +310,8 @@
     });
   </script>
 
-  <!-- original script includes (unchanged) -->
   <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
 </body>
 </html>
