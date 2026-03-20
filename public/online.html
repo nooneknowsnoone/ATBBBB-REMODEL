@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <title>Active Session</title>
+  <title>Active Session | Live Uptime Tracker</title>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -11,7 +11,7 @@
 
   <style>
     /* ──────────────────────────────────────────────
-       GLOBAL TRANSITION + BASE (exact match from your document)
+       GLOBAL TRANSITION + BASE (polished & refined)
     ────────────────────────────────────────────── */
     * { transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease; }
 
@@ -68,8 +68,8 @@
     }
 
     @keyframes dark-glow {
-      from { border-color: #666; }
-      to   { border-color: #aaa; }
+      from { border-color: #444; box-shadow: 0 2px 8px rgba(0,0,0,0.3);}
+      to   { border-color: #6c757d; box-shadow: 0 4px 12px rgba(0,0,0,0.5);}
     }
 
     body.dark-mode .img-thumbnail {
@@ -78,24 +78,24 @@
     }
 
     body.dark-mode .user-info p {
-      color: #aaa;
+      color: #bbb;
     }
 
     body.dark-mode .uptime-user {
-      color: #6ea8fe;
+      color: #7aa9ff;
     }
 
     .container {
       background-color: #ffffff;
-      border-radius: 20px;
+      border-radius: 24px;
       box-shadow: 0 8px 30px rgba(0, 0, 0, 0.05);
-      padding: 24px;
+      padding: 28px;
       margin-top: 20px;
       margin-bottom: 20px;
       border: 1px solid rgba(0,0,0,0.05);
     }
 
-    /* Theme toggle – placed directly below links with minimal spacing */
+    /* Theme toggle – centered under nav links */
     .theme-toggle {
       width: 48px;
       height: 48px;
@@ -108,7 +108,8 @@
       justify-content: center;
       cursor: pointer;
       box-shadow: 0 4px 12px rgba(0,0,0,0.4);
-      margin: 8px auto 0 auto;  /* maliit na espasyo lang sa ibaba ng links */
+      margin: 8px auto 0 auto;
+      transition: transform 0.2s, background 0.2s;
     }
 
     body:not(.dark-mode) .theme-toggle {
@@ -126,7 +127,7 @@
       transform: scale(1.08);
     }
 
-    /* Vertical nav links – tight spacing to match screenshot */
+    /* Vertical nav links – tight spacing clean */
     .navbar-nav-vertical {
       flex-direction: column;
       align-items: flex-start;
@@ -137,7 +138,7 @@
       padding: 8px 16px;
       font-size: 1rem;
       border-radius: 8px;
-      margin-bottom: 2px;  /* halos magkadikit */
+      margin-bottom: 2px;
       transition: all 0.2s;
     }
 
@@ -149,36 +150,40 @@
       background: rgba(255,255,255,0.08);
     }
 
-    /* User cards (exact from your document) */
+    /* Enhanced user cards — modern, readable uptime */
     #user_online {
       display: flex;
       flex-wrap: wrap;
-      gap: 16px;
+      gap: 20px;
+      margin-top: 10px;
     }
 
     .user-card {
       display: flex;
       align-items: center;
-      margin-bottom: 10px;
-      border: 1px solid #dee2e6;
-      border-radius: 16px;
-      padding: 12px;
+      border: 1px solid #e9ecef;
+      border-radius: 20px;
+      padding: 16px 20px;
       width: 100%;
-      text-align: center;
-      overflow: auto;
-      animation: glow 3s infinite alternate;
       background-color: #ffffff;
+      transition: all 0.2s ease-in-out;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.02);
     }
 
-    @keyframes glow {
-      from { border-color: #000; }
-      to   { border-color: #fff; }
+    .user-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 20px rgba(0,0,0,0.08);
+      border-color: #ced4da;
     }
 
     .user-card img {
-      max-width: 60px;
-      border-radius: 12px;
-      margin-right: 16px;
+      width: 64px;
+      height: 64px;
+      object-fit: cover;
+      border-radius: 18px;
+      margin-right: 20px;
+      border: 2px solid #f1f3f5;
+      transition: 0.2s;
     }
 
     .user-info {
@@ -187,27 +192,69 @@
     }
 
     .user-info h4 {
-      margin: 0 0 3px 3px;
-      font-size: 16px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+      margin: 0 0 6px 0;
+      font-size: 1.2rem;
       font-weight: 600;
+      letter-spacing: -0.2px;
+      color: #1e2a3a;
+    }
+
+    body.dark-mode .user-info h4 {
+      color: #f0f0f0;
     }
 
     .user-info p {
-      margin: 0;
-      font-size: 13px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      color: #555;
+      margin: 0 0 4px 0;
+      font-size: 0.85rem;
+      color: #6c757d;
+      word-break: break-all;
+      white-space: normal;
     }
 
-    p.uptime-user {
-      font-size: 12px;
-      color: #0d6efd;
-      font-weight: 500;
+    .uptime-user {
+      font-size: 0.85rem;
+      font-weight: 600;
+      background: #eef2ff;
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 40px;
+      color: #0a58ca;
+      margin-top: 8px !important;
+      font-family: monospace;
+      letter-spacing: 0.3px;
+    }
+
+    body.dark-mode .uptime-user {
+      background: #1e2a3e;
+      color: #90caf9;
+    }
+
+    .badge-online {
+      background: #28a745;
+      color: white;
+      font-size: 0.7rem;
+      border-radius: 30px;
+      padding: 3px 8px;
+      margin-left: 10px;
+      vertical-align: middle;
+    }
+
+    .refresh-note {
+      font-size: 0.75rem;
+      color: #adb5bd;
+      margin-top: 16px;
+      text-align: center;
+      border-top: 1px dashed #dee2e6;
+      padding-top: 16px;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px);}
+      to { opacity: 1; transform: translateY(0);}
+    }
+
+    .user-card {
+      animation: fadeIn 0.3s ease forwards;
     }
   </style>
 </head>
@@ -228,7 +275,6 @@
         <li class="nav-item">
           <a class="nav-link" href="/guide"><i class="fas fa-book"></i> Guide</a>
         </li>
-       
         <li class="nav-item">
           <div class="theme-toggle" id="themeToggle" title="Toggle dark/light mode">
             <i class="fas fa-moon" id="themeIcon"></i>
@@ -240,16 +286,28 @@
 
   <!-- Main Content -->
   <div class="container">
-    <div class="row">
-      <h1 class="col text-start" style="margin-left: 12px; font-size: 20px;">
-        <i class="fas fa-users"></i> Current Online:
-      </h1>
+    <div class="row align-items-center">
+      <div class="col">
+        <h1 style="font-size: 1.6rem; font-weight: 600; margin-bottom: 0;">
+          <i class="fas fa-users" style="margin-right: 10px;"></i> Current Online
+          <span id="onlineCountBadge" class="badge badge-primary ml-2" style="font-size: 0.9rem;">0</span>
+        </h1>
+        <p class="text-muted mt-2" style="font-size: 0.85rem;"><i class="fas fa-sync-alt"></i> Live uptime — updates every second</p>
+      </div>
     </div>
-    <div class="row" id="user_online"></div>
+    <div class="row" id="user_online">
+      <div class="col-12 text-center py-5 text-muted">
+        <i class="fas fa-spinner fa-pulse fa-2x"></i>
+        <p class="mt-2">Loading active sessions...</p>
+      </div>
+    </div>
+    <div class="refresh-note">
+      <i class="far fa-clock"></i> Uptime counter refreshes in real time
+    </div>
   </div>
 
   <script>
-    // Theme Toggle Logic
+    // Theme Toggle Logic (enhanced)
     const themeToggle = document.getElementById('themeToggle');
     const themeIcon = document.getElementById('themeIcon');
     const body = document.body;
@@ -282,77 +340,247 @@
       }
     });
 
-    // Original Active logic
-    async function listOfAi() {
-      const userOnline = document.getElementById("user_online");
-      try {
-        const response = await fetch("/info");
-        const data = await response.json();
-        userOnline.innerHTML = '';
+    // ---------------------- CORE UPTIME LOGIC (FIXED) ----------------------
+    // timeFormat: Converts seconds into human readable format (days, hours, minutes, seconds)
+    // Fixed to show proper grammar and correct spacing. Returns formatted uptime string.
+    function timeFormat(seconds) {
+      if (seconds === undefined || seconds === null || isNaN(seconds)) return '0 seconds';
+      
+      const days = Math.floor(seconds / 86400);
+      const hours = Math.floor((seconds % 86400) / 3600);
+      const minutes = Math.floor((seconds % 3600) / 60);
+      const secs = seconds % 60;
+      
+      const parts = [];
+      
+      if (days > 0) {
+        parts.push(`${days} day${days !== 1 ? 's' : ''}`);
+      }
+      if (hours > 0) {
+        parts.push(`${hours} hour${hours !== 1 ? 's' : ''}`);
+      }
+      if (minutes > 0) {
+        parts.push(`${minutes} minute${minutes !== 1 ? 's' : ''}`);
+      }
+      if (secs > 0 || parts.length === 0) {
+        parts.push(`${secs} second${secs !== 1 ? 's' : ''}`);
+      }
+      
+      // join with commas and 'and' for better readability
+      if (parts.length === 1) return parts[0];
+      if (parts.length === 2) return parts.join(' and ');
+      const last = parts.pop();
+      return `${parts.join(', ')} and ${last}`;
+    }
 
-        data.forEach(user => {
-          const { name, thumbSrc, profileUrl, time } = user;
+    // Store interval references per user to clean up properly if needed
+    let activeIntervals = new Map(); // key = user index or unique id, value = intervalId
 
-          const userCard = document.createElement('div');
-          userCard.className = 'col-12 user-card mb-4';
-
-          const image = document.createElement('img');
-          image.src = thumbSrc;
-          image.alt = 'User Thumbnail';
-          image.className = 'img-thumbnail';
-
-          const userInfo = document.createElement('div');
-          userInfo.className = 'user-info';
-
-          const userName = document.createElement('h4');
-          userName.textContent = name;
-
-          const profileLink = document.createElement('p');
-          profileLink.innerHTML = profileUrl;
-
-          const uptimeUser = document.createElement('p');
-          uptimeUser.className = 'uptime-user';
-          uptimeUser.innerHTML = `Uptime: ${timeFormat(time)}`;
-
-          userInfo.appendChild(userName);
-          userInfo.appendChild(profileLink);
-          userInfo.appendChild(uptimeUser);
-
-          userCard.appendChild(image);
-          userCard.appendChild(userInfo);
-          userOnline.appendChild(userCard);
-
-          const intervalId = setInterval(() => {
-            user.time++;
-            updateTimer(userCard, user.time);
-          }, 1000);
-        });
-      } catch (error) {
-        console.error(error);
-        userOnline.innerHTML = `<div class="alert alert-danger" role="alert">An error occurred while fetching data.</div>`;
+    // Function to update a specific user's uptime display
+    function updateUserUptime(userCardElement, currentSeconds) {
+      if (!userCardElement) return;
+      const uptimeElement = userCardElement.querySelector('.uptime-user');
+      if (uptimeElement) {
+        const formatted = timeFormat(currentSeconds);
+        uptimeElement.innerHTML = `<i class="fas fa-hourglass-half" style="font-size: 0.7rem; margin-right: 6px;"></i> Uptime: ${formatted}`;
       }
     }
 
-    function updateTimer(userCard, currentTime) {
-      const uptimeUser = userCard.querySelector('.uptime-user');
-      uptimeUser.textContent = `Uptime: ${timeFormat(currentTime)}`;
+    // Main function to fetch and render online users with live uptime counters
+    async function listOfAi() {
+      const userOnlineContainer = document.getElementById("user_online");
+      
+      // Clear any existing intervals before re-rendering (prevents memory leaks and double timers)
+      for (let [key, intervalId] of activeIntervals.entries()) {
+        clearInterval(intervalId);
+      }
+      activeIntervals.clear();
+      
+      try {
+        const response = await fetch("/info");
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        
+        // Validate data is array
+        if (!Array.isArray(data)) {
+          throw new Error("Invalid data format from server");
+        }
+        
+        // Update online count badge
+        const countBadge = document.getElementById('onlineCountBadge');
+        if (countBadge) {
+          countBadge.textContent = data.length;
+        }
+        
+        // If no users, show empty state
+        if (data.length === 0) {
+          userOnlineContainer.innerHTML = `<div class="col-12 text-center py-5 text-muted">
+            <i class="fas fa-user-slash fa-2x"></i>
+            <p class="mt-2">No active sessions at the moment</p>
+          </div>`;
+          return;
+        }
+        
+        // Clear loading state
+        userOnlineContainer.innerHTML = '';
+        
+        // Loop through each user and create card with independent uptime counter
+        data.forEach((user, index) => {
+          // Destructure with fallback values
+          const { 
+            name = 'Anonymous User', 
+            thumbSrc = 'https://via.placeholder.com/64x64?text=User', 
+            profileUrl = '#', 
+            time = 0 
+          } = user;
+          
+          // Ensure time is a number (seconds)
+          let currentUptimeSeconds = typeof time === 'number' ? time : parseInt(time) || 0;
+          
+          // Create card element
+          const userCard = document.createElement('div');
+          userCard.className = 'col-12 user-card mb-3';
+          userCard.setAttribute('data-user-id', index);
+          
+          // Image thumbnail
+          const image = document.createElement('img');
+          image.src = thumbSrc;
+          image.alt = `${name}'s avatar`;
+          image.className = 'img-thumbnail rounded';
+          image.onerror = function() {
+            this.src = 'https://via.placeholder.com/64x64?text=Avatar';
+          };
+          
+          // User info container
+          const userInfo = document.createElement('div');
+          userInfo.className = 'user-info';
+          
+          // Name with online badge
+          const userName = document.createElement('h4');
+          userName.innerHTML = `${escapeHtml(name)} <span class="badge-online"><i class="fas fa-circle" style="font-size: 8px; margin-right: 4px;"></i> online</span>`;
+          
+          // Profile link
+          const profileLink = document.createElement('p');
+          const linkElement = document.createElement('a');
+          linkElement.href = profileUrl;
+          linkElement.target = "_blank";
+          linkElement.rel = "noopener noreferrer";
+          linkElement.style.color = "#0d6efd";
+          linkElement.style.textDecoration = "none";
+          linkElement.innerHTML = `<i class="fas fa-link"></i> ${escapeHtml(profileUrl.length > 50 ? profileUrl.substring(0, 47) + '...' : profileUrl)}`;
+          profileLink.appendChild(linkElement);
+          
+          // Uptime element
+          const uptimeUser = document.createElement('p');
+          uptimeUser.className = 'uptime-user';
+          uptimeUser.innerHTML = `<i class="fas fa-hourglass-half" style="font-size: 0.7rem; margin-right: 6px;"></i> Uptime: ${timeFormat(currentUptimeSeconds)}`;
+          
+          // Append elements
+          userInfo.appendChild(userName);
+          userInfo.appendChild(profileLink);
+          userInfo.appendChild(uptimeUser);
+          userCard.appendChild(image);
+          userCard.appendChild(userInfo);
+          userOnlineContainer.appendChild(userCard);
+          
+          // Start a dedicated interval to increment and update uptime for this user
+          const intervalId = setInterval(() => {
+            // Increment seconds for this user
+            currentUptimeSeconds++;
+            // Update the display inside this specific card
+            const updatedUptimeElement = userCard.querySelector('.uptime-user');
+            if (updatedUptimeElement) {
+              const freshFormatted = timeFormat(currentUptimeSeconds);
+              updatedUptimeElement.innerHTML = `<i class="fas fa-hourglass-half" style="font-size: 0.7rem; margin-right: 6px;"></i> Uptime: ${freshFormatted}`;
+            }
+          }, 1000);
+          
+          // Store interval with unique identifier (use index + name combo to avoid collisions)
+          const intervalKey = `${index}-${name}-${Date.now()}`;
+          activeIntervals.set(intervalKey, intervalId);
+          
+          // Optional: attach interval id to card for later cleanup if needed
+          userCard.setAttribute('data-interval-key', intervalKey);
+        });
+        
+      } catch (error) {
+        console.error("Error fetching active sessions:", error);
+        const userOnlineContainer = document.getElementById("user_online");
+        userOnlineContainer.innerHTML = `<div class="col-12">
+          <div class="alert alert-danger shadow-sm" role="alert">
+            <i class="fas fa-exclamation-triangle"></i> Failed to load active sessions. 
+            <strong>Error:</strong> ${escapeHtml(error.message)}. <br>
+            <small>Make sure the backend endpoint <code>/info</code> is accessible and returns valid JSON.</small>
+          </div>
+        </div>`;
+        // update badge to 0 on error
+        const countBadge = document.getElementById('onlineCountBadge');
+        if (countBadge) countBadge.textContent = '0';
+      }
     }
-
-    function timeFormat(currentTime) {
-      const days    = Math.floor(currentTime / (3600 * 24));
-      const hours   = Math.floor((currentTime % (3600 * 24)) / 3600);
-      const minutes = Math.floor((currentTime % 3600) / 60);
-      const seconds = currentTime % 60;
-
-      let str = '';
-      if (days > 0)    str += `\( {days} day \){days > 1 ? 's' : ''} `;
-      if (hours > 0)   str += `\( {hours} hour \){hours > 1 ? 's' : ''} `;
-      if (minutes > 0) str += `\( {minutes} minute \){minutes > 1 ? 's' : ''} `;
-      str += `\( {seconds} second \){seconds > 1 ? 's' : ''}`;
-      return str.trim();
+    
+    // Helper to escape HTML to prevent XSS
+    function escapeHtml(str) {
+      if (!str) return '';
+      return str.replace(/[&<>]/g, function(m) {
+        if (m === '&') return '&amp;';
+        if (m === '<') return '&lt;';
+        if (m === '>') return '&gt;';
+        return m;
+      }).replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, function(c) {
+        return c;
+      });
     }
-
+    
+    // Optional: Refresh the entire user list periodically (e.g., every 30 seconds) to sync new users or remove offline ones
+    // But we keep individual uptime timers running; when we re-fetch we must reinitialize.
+    let refreshTimer = null;
+    
+    async function refreshUserList() {
+      // Clear existing intervals before rebuilding
+      for (let [key, intervalId] of activeIntervals.entries()) {
+        clearInterval(intervalId);
+      }
+      activeIntervals.clear();
+      // Fetch fresh user list and recreate cards with uptime starting from server time
+      await listOfAi();
+    }
+    
+    // Call initial load
     listOfAi();
+    
+    // Set up periodic refresh every 30 seconds to get new users / remove offline users
+    // This ensures the session list stays accurate while preserving per-second uptime counters
+    // But careful: we must not double intervals. Using a flag to prevent overlapping refreshes.
+    let isRefreshing = false;
+    setInterval(async () => {
+      if (!isRefreshing) {
+        isRefreshing = true;
+        try {
+          await refreshUserList();
+        } catch (e) {
+          console.warn("Background refresh failed", e);
+        } finally {
+          isRefreshing = false;
+        }
+      }
+    }, 30000); // Refresh every 30 seconds
+    
+    // Also expose manual refresh if needed (optional via window)
+    window.manualRefresh = refreshUserList;
+    
+    // Cleanup intervals before page unload (good practice)
+    window.addEventListener('beforeunload', () => {
+      for (let [key, intervalId] of activeIntervals.entries()) {
+        clearInterval(intervalId);
+      }
+      if (refreshTimer) clearInterval(refreshTimer);
+    });
+    
+    // For debugging: show in console that uptime system is active
+    console.log("✅ Uptime tracker active — each session shows proper days/hours/minutes/seconds");
   </script>
 
   <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
